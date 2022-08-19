@@ -18,3 +18,4 @@ sudo apt-get install qemu binfmt-support qemu-user-static
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 ```
 
+Then just run `build.sh`. If that exits successfully the build succeeded.
