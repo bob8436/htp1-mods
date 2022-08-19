@@ -1,0 +1,11 @@
+[Unit]
+Description=AuthKeyService
+Before=sshd.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/copy-ssh-key.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+# <file system>                                 <mount point>   <type>  <options>                                                       <dump>  <pass>
+tmpfs                                           /tmp            tmpfs   defaults,nosuid                                                 0       0
+/var/swap none swap sw 0 0
+UUID=968a1271-fece-411f-9fc8-fe22a2ea23bf       /               ext4    defaults,noatime,nodiratime,commit=600,errors=remount-ro,x-gvfs-hide    0       1
+UUID=16f9d8ac-7a21-4d3f-b3d2-033a6ddbeb67	/var/log	ext4	defaults,noatime,nodiratime,commit=600,errors=remount-ro,x-gvfs-hide	0	1
+UUID=2287-07A6	/vfat	vfat	defaults,errors=remount-ro	0	1
+/dev/mmcblk1boot0 /mnt/rodata ext4 defaults,nofail,ro 0 0
+/dev/mmcblk2boot0 /mnt/rodata ext4 defaults,nofail,ro 0 0
