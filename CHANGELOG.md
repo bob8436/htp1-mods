@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1-mod-r2]
+### Added
+- JSoosiah's custom UI now available at /custom
+- JSoosiah's background service runs automatically
+
+### Changed
+- Switched to GPT partition layout, ext4 partitions hidden
 
 ## [1.9.1-mod-r1]
 
