@@ -1,0 +1,11 @@
+[Unit]
+Description=Htp1BackgroundService
+After=olympia.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/background-service.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
