@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.1-mod-r3]
+### Added
+- README and LICENSE files to vfat partition
+
+### Changed
+- HTP-1 upgrade source disabled. No updates on this firmware.
+
+### Removed
+- Scripts and artifacts relating to HTP-1 upgrades
+
+
 ## [1.9.1-mod-r2]
 ### Added
 - JSoosiah's custom UI now available at /custom
