@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.1-mod-r4]
+### Changed
+- Integrated OLIMEX patch to set min CPU voltage to 1.3v
+- Pinned CPU speed to 912mhz
+
 ## [1.9.1-mod-r3]
 ### Added
 - README and LICENSE files to vfat partition
@@ -9,7 +14,6 @@
 
 ### Removed
 - Scripts and artifacts relating to HTP-1 upgrades
-
 
 ## [1.9.1-mod-r2]
 ### Added

@@ -1,0 +1,13 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "allwinner,sun7i-a20";
+
+    fragment@0 {
+        target = <&reg_dcdc2>;
+        __overlay__ {
+            regulator-min-microvolt = <1300000>;
+        };
+    };
+};

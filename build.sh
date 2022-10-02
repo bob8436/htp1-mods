@@ -15,6 +15,9 @@ fi
 mkdir -p ${WORK_DIR}
 mkdir -p ${HTP1_ROOT_DIR}
 
+rm -rf ${WORK_DIR}/output_root_fs
+rm -rf ${WORK_DIR}/output.img
+
 if [[ ! -f ${WORK_DIR}/rescue.zip ]]; then
   echo Fetching ${HTP1_RESCUE_URL}
   wget --show-progress -O ${WORK_DIR}/rescue.zip ${HTP1_RESCUE_URL}
