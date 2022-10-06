@@ -4,6 +4,7 @@
 ### Changed
 - Integrated OLIMEX patch to set min CPU voltage to 1.3v
 - Pinned CPU speed to 912mhz
+- Ensured /custom UI path sticks with /custom URL
 
 ## [1.9.1-mod-r3]
 ### Added
