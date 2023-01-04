@@ -1,0 +1,11 @@
+[Unit]
+Description=ConfigJsonKeyService
+Before=olympia.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/olympia/restore-config.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
