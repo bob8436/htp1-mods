@@ -1,11 +1,11 @@
-verbosity=6
+verbosity=1
 console=both
 disp_mode=1920x1080p60
 overlay_prefix=sun7i-a20
-rootdev=UUID=89149220-1191-44ce-b2a5-e337eeef8f1d
+rootdev=UUID=cf4b77d8-1288-49ff-aec8-45f74fc6e761
 rootfstype=ext4
 user_overlays=removeleds sun7i-a20-spi1 ldo3-pe ldo4-always-on sun7i-a20-i2s0 sun7i-a20-spi0 pwm0-backlight rtp simple-codec-overlay wifibtpower cpu-volt
 overlays=pwm
-extraargs=logo.nologo vt.global_cursor_default=0 ignore_loglevel debug=vc
-logo=disabled
+extraargs=logo.nologo vt.global_cursor_default=0 fbcon=map:2 quiet
+logo=okay
 usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u

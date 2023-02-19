@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.9.1-mod-r5]
+### Added
+- config.json file on FAT32 partition is automatically imported
+- Added installer artifact to install firmware into HTP-1 MMC
+- Installer automatically updates APM firmware to v253
+- SD-card firmware provides option to update APM firmware to v253
+- Custom boot logo
+
+### Changed
+- JSoosiah Custom UI updated to v0.17.0
+- Logrotate rotation no longer breaks logging
+- Ramdisk now enabled by default; can be disabled from UI
+- Disabled Alexa integration, which didnt work and spammed logs
+- Console logging during boot mostly turned off
+- Fixed an issue where DNS timeouts caused hang at Almost Ready
+- Enable /webapi interface to accept any change to MSO
+
 ## [1.9.1-mod-r4]
 ### Changed
 - Integrated OLIMEX patch to set min CPU voltage to 1.3v

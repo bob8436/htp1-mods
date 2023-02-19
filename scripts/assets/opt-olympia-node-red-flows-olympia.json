@@ -1,0 +1,3372 @@
+[
+    {
+        "id": "f3732c66.fe9f9",
+        "type": "tab",
+        "label": "Verb Routing",
+        "disabled": false,
+        "info": "Verb Routing occurs on this flow.\n\nThis is effectively the \"entry point\" for any actions that originate from a WebSocket.\n\nThe verb is extracted, then the parameter (if present) is converted from JSON to a native JavaScript object.\n\nA switch statement called the Verb Router routes messages based on the verb sent.\n"
+    },
+    {
+        "id": "d9723a24.504ca8",
+        "type": "tab",
+        "label": "MSO Management",
+        "disabled": false,
+        "info": "This flow handles MSO management\n\n# Change Request Processor\n\nThe upper portion is the Change Request Processor, which dissects patches sent and routes them to the appropriate actualizers.\n\nIt is invoked by the verb `changemso`.\n\nThe parameter accepted is of a type JSON-Patch.\n\nThe patch is split into individual operations and routed based on the path to their \"actualizer\" (a flow that performs the actual requested behaviour on the hardware).\n\nEach operation is re-merged back into a patch, and the patch is passed to the Patch Deployer for deployment.\n\nA failure in an operation should generate an error, causing the client sending the request to revert the operation on its copy of the MSO. This portion is a WIP.\n\nIdeally if there is an operational failure the patch should be fully reverted with no action.\n\nAlso, it should be noted that in a practical system, this is not the only source of an `msoupdate` message. Changes originating in the hardware (stream type, etc) will generate NIC messages that turn into MSO changes that are _NOT_ processed as a change request.\n\n# Patch Deployer\nThe patch deployer is responsible for deploying a patch to the MSO to both the master copy as well as the connected clients for object synchronization.\n\nActualizers should route their messages to it upon successful actualization of a patch; this notifies everyone of the new status.\n\nA processor of system status (read-only portions of MSO) should route its status here as a patch as well.\n\nThe general rule is, external controls (IR, Web Page, Alexa, Front Panel) route to the Change Request Processor, and internal status routes directly to the Patch Deployer.\n"
+    },
+    {
+        "id": "9d3c7b29.75e418",
+        "type": "tab",
+        "label": "System Page",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "f004e20e.11d2f",
+        "type": "tab",
+        "label": "Computer Source Audio Management",
+        "disabled": false,
+        "info": "See in Commander, \"audio_management\".\n"
+    },
+    {
+        "id": "ee65b866.781048",
+        "type": "tab",
+        "label": "Update",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "1386606c.9db65",
+        "type": "tab",
+        "label": "eng",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "a5324352.454fb",
+        "type": "tab",
+        "label": "feedback",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "ae17ef01.d8dec",
+        "type": "websocket-listener",
+        "z": "",
+        "path": "/ws/controller",
+        "wholemsg": "false"
+    },
+    {
+        "id": "d57fa3c.862a36",
+        "type": "websocket in",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 151,
+        "y": 119,
+        "wires": [
+            [
+                "5d5aa7d7.955738"
+            ]
+        ]
+    },
+    {
+        "id": "aef4882c.581858",
+        "type": "switch",
+        "z": "f3732c66.fe9f9",
+        "name": "Verb Router",
+        "property": "verb",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "getmso",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "changemso",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "init",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "avcui",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ircmd",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "btreply",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "btdiscover",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "wifiscan",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "netapply",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "applydebug",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "factoryreset",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "updatefirmware253",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 13,
+        "x": 250,
+        "y": 320,
+        "wires": [
+            [
+                "7494c209.3fd54c"
+            ],
+            [
+                "79b96e9e.9db06"
+            ],
+            [
+                "79b96e9e.9db06"
+            ],
+            [
+                "46957ecf.19aac"
+            ],
+            [
+                "c257666d.c71008"
+            ],
+            [
+                "a08b1840.db93a8"
+            ],
+            [
+                "13a9d472.addc3c"
+            ],
+            [
+                "88380785.3d0908"
+            ],
+            [
+                "e22f725b.72b89"
+            ],
+            [
+                "a60c8105.099d7"
+            ],
+            [
+                "6a7ea70e.6c15b8"
+            ],
+            [
+                "effc2f94.d2705"
+            ],
+            [
+                "28487a7b.83d4a6"
+            ]
+        ]
+    },
+    {
+        "id": "5d5aa7d7.955738",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "Verb Extractor",
+        "func": "console.log('From ' + (msg.fromController !== undefined ? 'posixmq_read' : '/ws/controller') + ': ' + msg.payload);\n\ni = msg.payload.indexOf(\" \");\nif(i>0)\n{\n    msg.verb = msg.payload.slice(0,i);\n    msg.payload = msg.payload.slice(i+1);\n}\nelse\n{\n    msg.verb = msg.payload;\n    msg.payload = \"null\";\n}\n\n//console.log(':T:NEWVERB: ' + (new Date() - global.get('newverb')) + ' ms since last verb; new ' + msg.verb);\nglobal.set('newverb', new Date());\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 435,
+        "y": 117,
+        "wires": [
+            [
+                "6f0ab243.0bce8c"
+            ]
+        ]
+    },
+    {
+        "id": "6f0ab243.0bce8c",
+        "type": "json",
+        "z": "f3732c66.fe9f9",
+        "name": "Parameter Interpreter",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 180,
+        "y": 200,
+        "wires": [
+            [
+                "aef4882c.581858"
+            ]
+        ]
+    },
+    {
+        "id": "ed40dd96.92c07",
+        "type": "websocket out",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 1258,
+        "y": 615,
+        "wires": []
+    },
+    {
+        "id": "be1817bf.de74e8",
+        "type": "json",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "property": "payload",
+        "action": "str",
+        "pretty": false,
+        "x": 1164,
+        "y": 202,
+        "wires": [
+            [
+                "4e6361a4.8a881"
+            ]
+        ]
+    },
+    {
+        "id": "79b96e9e.9db06",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "changemso",
+        "links": [
+            "59432cca.445764"
+        ],
+        "x": 653,
+        "y": 248,
+        "wires": []
+    },
+    {
+        "id": "59432cca.445764",
+        "type": "link in",
+        "z": "d9723a24.504ca8",
+        "name": "from changemso",
+        "links": [
+            "79b96e9e.9db06",
+            "d6daa338.466c7"
+        ],
+        "x": 165,
+        "y": 53,
+        "wires": [
+            [
+                "a9eca636.c36698"
+            ]
+        ]
+    },
+    {
+        "id": "28487a7b.83d4a6",
+        "type": "change",
+        "z": "f3732c66.fe9f9",
+        "name": "Bad Verb Response",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error \"bad-verb\"",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 763,
+        "y": 610,
+        "wires": [
+            [
+                "ed40dd96.92c07"
+            ]
+        ]
+    },
+    {
+        "id": "7494c209.3fd54c",
+        "type": "change",
+        "z": "f3732c66.fe9f9",
+        "name": "MSO Fetch",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "mso",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 767,
+        "y": 206,
+        "wires": [
+            [
+                "be1817bf.de74e8"
+            ]
+        ]
+    },
+    {
+        "id": "dc5f8331.5afbb",
+        "type": "websocket out",
+        "z": "d9723a24.504ca8",
+        "name": "Patch Broadcast",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 1171,
+        "y": 156,
+        "wires": []
+    },
+    {
+        "id": "fac2ce0a.1a5c7",
+        "type": "json",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "property": "payload",
+        "action": "str",
+        "pretty": false,
+        "x": 648,
+        "y": 171,
+        "wires": [
+            [
+                "648de005.48a08"
+            ]
+        ]
+    },
+    {
+        "id": "648de005.48a08",
+        "type": "template",
+        "z": "d9723a24.504ca8",
+        "name": "Verb Adder (msoupdate)",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "msoupdate {{{payload}}}",
+        "output": "str",
+        "x": 892,
+        "y": 159,
+        "wires": [
+            [
+                "dc5f8331.5afbb",
+                "d663bc4b.e6c7b"
+            ]
+        ]
+    },
+    {
+        "id": "4e6361a4.8a881",
+        "type": "template",
+        "z": "f3732c66.fe9f9",
+        "name": "Verb Append (MSO)",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "mso {{{payload}}}",
+        "output": "str",
+        "x": 1314,
+        "y": 457,
+        "wires": [
+            [
+                "ed40dd96.92c07"
+            ]
+        ]
+    },
+    {
+        "id": "adb6443.67d73b8",
+        "type": "comment",
+        "z": "d9723a24.504ca8",
+        "name": "Monitoring an MSO path",
+        "info": "To monitor a path in the MSO, simply expand this switch to route the message to your desired processor.\n\nYou may need to use a regex in the case of watching something in an object.\n",
+        "x": 163,
+        "y": 349,
+        "wires": []
+    },
+    {
+        "id": "91211ffa.259ab",
+        "type": "comment",
+        "z": "d9723a24.504ca8",
+        "name": "Output Routing",
+        "info": "The output of the switch is intended to be routed off-page to the actualizer flow.\n\nThe actualizer flow performs whatever actions are necessary to cause the system to cause the intended action to take effect, then the actualizer flow should use an off-page link to return to the flow at \"Patch Element Done\" (The link before join).\n\nTODO: Still need to work out how to to handle errors.",
+        "x": 902,
+        "y": 248,
+        "wires": []
+    },
+    {
+        "id": "6351622e.305b2c",
+        "type": "comment",
+        "z": "d9723a24.504ca8",
+        "name": "Legality of configuration",
+        "info": "Main: [2,3,4,5,6,7,8,9]\nSurrounds without back OK\nBack without surround NOT OK\nWide without back NOT OK\nNo rules regarding center channel present/absent.\n\nSubs: [0,1,2,3]\nCan't turn on extra subs without first sub.\n1 sub mono\n2 sub stereo\n3 subs stereo + 1 mono\n\nHighs: [0,2,4,6] < Valid sets\nOnly one pair of highs is top middle.\nOnly two pairs of highs, front and rear.\nThree pairs is front/middle/rear.\nEach pair can be wall/ceiling (height/top)\n\nFC must be multiples of 10 between 40 and 200.\n\n*Max 16 speakers.*\n\nMSO should have:\nEach group must have on/off. (Except front l/r)\nEach group except subs has fc and size.\nUpper groups have wall/ceiling.\nWides and top/middle need disambiguation for connector (config1/config2/tftm). (for remap)\nExtra subs not reassignable.\n\nConnection: pair number, 1-indexed, only using 5-8 as these are only changing ones.\n\nlm: count number of main, count number of sub, number of height...\n\nUI purposes: All top or all height.\nSchema: top/rear front or top/rear high\n\n`\n{\n    \"groups\":{\n        \"lr\":\n        {\n            \"size\": \"s\",\n            \"fc\": 200            \n        },\n        \"c\":\n        {\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"lrs\":\n        {\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"lrb\":\n        {\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"sub\":\n        {\n            \"present\": true\n        },\n        \"lrw\":\n        {\n            \"connector\": 8,\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"lrtf\":\n        {\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"lrtm\":\n        {\n            \"connector\": 7,\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"lrtr\":\n        {\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"lrhf\":\n        {\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"lrhr\":\n        {\n            \"present\": true,\n            \"size\": \"s\",\n            \"fc\": 200\n        },\n        \"sub2\":\n        {\n            \"present\": false\n        },\n        \"sub3\":\n        {\n            \"present\": false\n        }\n    }\n}\n`",
+        "x": 410,
+        "y": 542,
+        "wires": []
+    },
+    {
+        "id": "a9eca636.c36698",
+        "type": "function",
+        "z": "d9723a24.504ca8",
+        "name": "Commander",
+        "func": "//console.log(':T:ELAPSE: ' + (new Date() - global.get('newverb')) + ' ms enter cmdr');\n\njsonpatch = global.get('jsonpatch');\nmso = global.get('mso');\nfs = global.get('fs');\npointer = global.get('pointer');\ncp = global.get('cp');\n\nmsop = pointer(mso);\n\nif(msg.verb!==\"init\")\n{\n    msg.patcherr =  jsonpatch.validate(msg.payload, mso);\n\n    if(msg.patcherr!==undefined)\n    {\n        return [null,null,{payload:'error {\"module\":\"json-fast-patch\", \"command\":\"validate\", \"content\":'+JSON.stringify(msg.patcherr) + \"}\"}];\n    }\n    postpatch = jsonpatch.applyPatch(jsonpatch.deepClone(mso), msg.payload).newDocument;\n}\nelse\n{\n    if((msg.payload!==undefined) &&\n        (msg.payload!==null) &&\n        (msg.payload.subcmd!==undefined) && \n        (msg.payload.subcmd=='powerOnVolReq')) {\n        mso.volume = mso.powerOnVol;\n        mso.powerAction = \"none\";\n        global.set('mso', mso);\n        return([{payload : \n                  { \"op\":\"replace\",\n                    \"path\":\"/volume\",\n                    \"value\":mso.powerOnVol\n                  }\n                },\n                {payload: \"mv \" + mso.powerOnVol},\n                null,\n                null]);\n    }\n\n    postpatch = mso;\n}\n\npostp = pointer(postpatch);\n\nsendToAvController = (payload) =>\n{\n    // Prevent feedback from the avController.\n    if((!msg.fromController)||(msg.verb==\"init\")) node.send([null,{payload: payload },null]);\n}\n\n// Recursive object compare\nfunction sameObjectValue(obj1, obj2) {\n    return Object.keys(obj1).every((key, idx) => {\n       if(!Object.keys(obj2).includes(key)) return false; // A key does not exist.\n       return sameValue(obj1[key], obj2[key]); // Recursive.\n    });\n}\n\n// Deep array compare\nfunction sameArrayValue(arr1, arr2) {\n    return arr1.every((key, idx) => sameValue(arr1[idx], arr2[idx]));\n}\n\n// Basic value compare\nfunction sameValue(val1, val2) {\n    if(val1===val2) return true;\n    if((val1===undefined) || (val1===null) || (val2===undefined) || (val2===null)) return false;\n    if(val1.constructor === val2.constructor)\n    {\n        if(val1.constructor.name=='Object') return sameObjectValue(val1, val2);\n        if(val1.constructor.name=='Array') return sameArrayValue(val1, val2);\n    }\n    return false;\n}\n\n/** Check a value in the MSO and dispatch a callback if it has changed.\n * \n * @param {*} ptr A JSON-Pointer string indicating a particular value to inspect for changes.\n * @param {*} cb A callback to be called with the new value, if the value is changed. \n */\nfunction ifChanged(ptr, cb) {\n    if(msg.verb!='init') // The callback is always invoked on \"init\"\n    {\n        if(!msop.has(ptr)) node.warn(\"Warning: MSO has no object at pointer \" + ptr);\n        if(!postp.has(ptr)) node.warn(\"Warning: Post-Patch MSO has no object at pointer \" + ptr);\n        \n        if(msop.has(ptr) && postp.has(ptr))\n        {\n            if(sameValue(msop.get(ptr),postp.get(ptr))) return false;\n        }\n    }\n    var ret=cb(postp.get(ptr), msop.get(ptr));\n    if(ret && ret.constructor==String) sendToAvController(ret);\n    return true;\n}\n\nfunction spgFromGroups(spg){\n    // Generate lm command.\n    // Compile list of active speaker groups.\n    let mains = 2; // The 'lr' group is always present.\n    let subs = 0;\n    let frontTops = 0;\n    let frontHeights =0;\n    let middleTop = 0;\n    let rearTops = 0;\n    let rearHeights =0;\n    let uppers = 0;\n    let suffix = \" \";\n    Object.keys(spg).forEach(x=>\n    {\n       switch(x)\n       {\n           case 'lr':\n               break;\n           case 'c':\n               mains+=spg[x].present?1:0;\n               break;\n           case 'lrs':\n           case 'lrb':\n           case 'lrw':\n               mains+=spg[x].present?2:0;\n               break;\n           case 'lrtf':\n               frontTops+=spg[x].present?2:0;\n               break;\n           case 'lrtm':\n               middleTop+=spg[x].present?2:0;\n               break;\n           case 'lrtr':\n               rearTops+=spg[x].present?2:0;\n               break;\n           case 'lrhf':\n               frontHeights+=spg[x].present?2:0;\n               break;\n           case 'lrhr':\n               rearHeights+=spg[x].present?2:0;\n               break;\n           case 'sub1':\n           case 'sub2':\n           case 'sub3':\n           case 'sub4':\n           case 'sub5':\n               subs+=spg[x].present?1:0;\n               break;\n       }\n    });\n    uppers = frontTops + middleTop + rearTops + frontHeights + rearHeights;\n    if (uppers > 2){\n        if ((frontTops !== 0)    && (rearHeights !== 0)) { suffix = \"\\\\\"; }\n        if ((frontHeights !== 0) && (rearTops !== 0)) { suffix = \"/\"; }\n    }\n    if (uppers !== 0){\n        if((frontTops +  rearTops)  === 0) {suffix = \"h\";}\n    }\n    if (uppers !== 0){\n        if((frontHeights + rearHeights) === 0)  {      \n            suffix = \"t\";\n            if (middleTop !== 0) {\n                suffix = \"\";\n            }\n        }\n    }\n    //node.warn(\"before return.\");\n    return('lm ' + mains + '.' + subs + '.' + uppers + suffix);\n} // end definition of function spgFromGroups\n\n// Comparisons start here:\n\n// signal generator\n// Note the switch statement practically duplicated 3 times to cover all cases.\n// If something changes, get it all right.\nifChanged(\"/sgen/sgensw\", (sgensw) =>{\n    node.warn(\"in sgen. new val: \"+sgensw);\n    \n    if (sgensw == \"off\") {\n        sendToAvController(\"gen off\");   // first turn off sine probe, then restore the source.\n        sendToAvController(\"sgen off\");  // this doesn't hurt if it's already off.\n        return;\n    }\n    \n    // The generator is turning on.  Set all.\n    switch(mso.sgen.signalType) {\n\t    case 'thx':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen thx \" + mso.sgen.select);\n\t\t    return;\n\t    case 'dolby':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen dolby \" + mso.sgen.select);\n            return;\n\t    case 'pulse':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen pulse \" + mso.sgen.select);\n\t\t    return;\n\t    case 'pink':\n            // The volume must be set to -30.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol -30&gen pink \" + mso.sgen.select);\n            return;\n\t    case 'sine':\n            // volume set by user.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol \" + postpatch.sgen.sinedb + \"&gen freq \" + postpatch.sgen.sinehz + \"&gen sine \" + postpatch.sgen.select);\n\t\t    return;\n\t    case 'left':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen left \"  + mso.sgen.select);\n\t\t    return;\n\t    case 'right':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen right \"  + mso.sgen.select);\n\t\t    return;\n\t    case 'both':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen both \"  + mso.sgen.select  + ' ' + mso.sgen.select2);\n\t\t    return;\n    }\n    node.warn(\"Unsupported signal type.\");\n    return;\n});\n\n// select: lf, rf, c, etc.\nifChanged(\"/sgen/select\", (select) =>{\n    if (mso.sgen.sgensw == \"off\") {\n        return;\n    }\n        \n    // only if the generator is on, change the destination channel.\n    switch(mso.sgen.signalType) {\n\t    case 'thx':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen thx \" + select);\n\t\t    return;\n\t    case 'dolby':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen dolby \" + select);\n            return;\n\t    case 'pulse':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen pulse \" + select);\n\t\t    return;\n\t    case 'pink':\n            // The volume must be set to -30.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol -30&gen pink \" + select);\n            return;\n\t    case 'sine':\n            // volume set by user.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol \" + postpatch.sgen.sinedb + \"&gen freq \" + postpatch.sgen.sinehz + \"&gen sine \" + select);\n\t\t    return;\n\t    case 'left':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen left \"  + select);\n\t\t    return;\n\t    case 'right':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen right \"  + select);\n\t\t    return;\n\t    case 'both':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen both \"  + select  + ' ' + mso.sgen.select2);\n\t\t    return;\n    }\n    node.warn(\"Unsupported signal type.\");\n    return;\n});\n\n// select2: lf, rf, c, etc.\nifChanged(\"/sgen/select2\", (select2) =>{\n    if (mso.sgen.sgensw == \"off\") {\n        return;\n    }\n    if (mso.sgen.signalType == \"both\")\n    {   // only if the 'both' generator is on, change the second source.\n        // sgen off because the source is what the user set..\n        sendToAvController(\"sgen off\");\n        sendToAvController(\"gen vol 0&gen both \"  + mso.sgen.select  + ' ' + select2);\n    }\n    return;\n});\n\n// sine, thx, etc\n// ifChanged(\"/sgen/signalType\", (signalType, previousType) =>{\nifChanged(\"/sgen/signalType\", (signalType) =>{\n    if (mso.sgen.sgensw == \"off\") return;\n\n    // A similar switch to set everything necessary for each type of generator\n    node.warn(\"in sgen. new signalType: \"+signalType);\n    switch(signalType) {\n\t    case 'thx':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen thx \" + mso.sgen.select);\n\t\t    return;\n\t    case 'dolby':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen dolby \" + mso.sgen.select);\n            return;\n\t    case 'pulse':\n            // The volume is zero.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol 0&gen pulse \" + mso.sgen.select);\n\t\t    return;\n\t    case 'pink':\n            // The volume must be set to -30.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol -30&gen pink \" + mso.sgen.select);\n            return;\n\t    case 'sine':\n            // volume set by user.  sgen on provides a clock only.\n            sendToAvController(\"sgen on\");\n            sendToAvController(\"gen vol \" + postpatch.sgen.sinedb + \"&gen freq \" + postpatch.sgen.sinehz + \"&gen sine \" + postpatch.sgen.select);\n\t\t    return;\n\t    case 'left':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen left \"  + mso.sgen.select);\n\t\t    return;\n\t    case 'right':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen right \"  + mso.sgen.select);\n\t\t    return;\n\t    case 'both':\n            // sgen off because the source is what the user set..\n            sendToAvController(\"sgen off\");\n            sendToAvController(\"gen vol 0&gen both \"  + mso.sgen.select  + ' ' + mso.sgen.select2);\n\t\t    return;\n    }\n    node.warn(\"Unsupported signal type.\");\n    return;\n});\n\nifChanged(\"/sgen/sinehz\", (hz) => {\n    if ((mso.sgen.sgensw == \"on\") && (mso.sgen.signalType == \"sine\")) {\n        sendToAvController(\"gen vol \" + postpatch.sgen.sinedb + \"&gen freq \" + hz + \"&gen\" + ' ' + postpatch.sgen.signalType + ' ' + postpatch.sgen.select);\n    }\n    return;\n});\nifChanged(\"/sgen/sinedb\", (db) => {\n    if ((mso.sgen.sgensw == \"on\") && (mso.sgen.signalType == \"sine\")) {\n        sendToAvController(\"gen vol \" + db + \"&gen freq \" + postpatch.sgen.sinehz + \"&gen\" + ' ' + postpatch.sgen.signalType + ' ' + postpatch.sgen.select);\n    }\n    return;\n});\n\n// Speakers\nifChanged(\"/speakers/groups\", (spg, oldspg) => {\n    // Walk the groups to find which is different.\n    Object.keys(spg).forEach(grp => {\n        // Generate new spg command if group has changed.\n        ifChanged(\"/speakers/groups/\" + grp, (grpobj, oldgrpobj) => {\n            if ((msg.verb==\"init\") || (grpobj.size !== oldgrpobj.size) || (grpobj.fc !== oldgrpobj.fc))\n                return ('bmg ' + grp + ' ' + grpobj.size + ' ' + grpobj.fc)\n        });\n    });\n    // Generate LM commands for both old and new, this compares to see if we have to issue a new lm command.\n    spglmcmd = spgFromGroups(spg);\n    //node.warn(spglmcmd);\n    if ((msg.verb==\"init\")||(spglmcmd != spgFromGroups(oldspg))) return spglmcmd; // Send to avController\n});\n// check for speaker map request\n//ifChanged(\"/speakers/getSpeakersToggle\",getSpeakersToggle=>(\"sendMap\"));\n// Lipsync\nifChanged(\"/cal/lipsync\", lipsync=>(\"delm \" + lipsync));\n// Volume 0% Listening Value\nifChanged(\"/cal/vpl\", vpl=>(\"vpl \" + vpl));\n// Volume 100% Listening Value\nifChanged(\"/cal/vph\", vph=>(\"vph \" + vph));\n// Volume - amplifier sensitivity\nifChanged(\"/cal/ampsense\", ampsense=>(\"AmpSense \" + ampsense));\n// headroom\nifChanged(\"/cal/headroom\", headroom=>(\"headroom \" + headroom));\n// Volume\nif(msg.verb!==\"init\")\n{\n    ifChanged(\"/volume\", (vol)=>{\n         if (mso.stat.systemAudio === false) {\n            postpatch.stat.systemAudio = true;\n            msg.payload.push({\"op\":\"replace\",\"path\":\"/stat/systemAudio\",\"value\":true});\n            node.send([null,{payload: 'mute off' },null]);\n        }\n        if (mso.muted) {\n            postpatch.muted = false;\n            msg.payload.push({\"op\":\"replace\",\"path\":\"/muted\",\"value\":false});\n            node.send([null,{payload: 'mute off' },null]);\n        }\n        return (\"mv \" + vol);\n    });\n}\n\n// EQ Page\nifChanged(\"/eq/tc\", tc=>(\"tc \"+ (tc?\"on\":\"off\")));\nifChanged(\"/eq/treble/freq\", freq=>(\"treble freq \" + freq));\nifChanged(\"/eq/treble/level\", level=>(\"treble \" + level));\nifChanged(\"/eq/bass/freq\", freq=>(\"bass freq \" + freq));\nifChanged(\"/eq/bass/level\", level=>(\"bass \" + level));\n\nifChanged(\"/peq/peqsw\", peqsw=>(\"peq \"+ (peqsw?\"on\":\"off\")));\n\n// CEC \nifChanged(\"/CEC/allowpwrk\",allowpwrk=>(allowpwrk?\"cec allowpwrk on\":\"cec allowpwrk off\"));\nifChanged(\"/CEC/allowvolk\",allowvolk=>(allowvolk?\"cec allowvolk on\":\"cec allowvolk off\"));\nifChanged(\"/CEC/allowsaf\" ,allowsaf=>(allowsaf?\"cec allowsaf on\":\"cec allowsaf off\"));\nifChanged(\"/CEC/allowinp\" ,allowinp =>(allowinp?\"cec allowinp on\":\"cec allowinp off\"));\nifChanged(\"/CEC/allowstdb\",allowstdb =>(allowstdb?\"cec allowstdb on\":\"cec allowstdb off\"));\nifChanged(\"/CEC/cecOnSw\",cecOnSw=>(cecOnSw==\"on\"?\"cec ena amp\":\"cec ena off\"));\n\n// bass enhancement\nifChanged(\"/bassenhance\", bassenhance=>(\"bmre \"+ bassenhance));\n\n// Bass Management Mode\nifChanged(\"/bmmmode\", bmm=>(\"bmm \"+bmm))\n\n// Sound Enhancement\nifChanged(\"/upmix/select\", upmixer=>(\"sur \" + upmixer));\nifChanged(\"/upmix/dts/ws\", ws=>(\"sur wide \"+ (ws?\"on\":\"off\")));\nifChanged(\"/upmix/dolby/cs\", cs=>(\"-cspread \" + (cs?\"enable\":\"disable\")));\nifChanged(\"/upmix/auro/lm\", lm=>(\"auro lm \" + lm));\nifChanged(\"/upmix/auro/preset\", preset=>(\"auro preset \" + preset));\nifChanged(\"/upmix/auro/strength\", strength=>(\"auro strength \" + strength));\n\n// Night Mode\nifChanged(\"/night\", nightmode=>(\"night \" + nightmode));\n\n// Loudness\nifChanged(\"/loudness\", loudness=>(\"loudness \" + loudness));\n// 140 - loudnessCal so that the explanation makes sense.  See User Guide.\nifChanged(\"/loudnessCal\", loudnessCal=>(\"lcvc cal \" + (140-loudnessCal)));\nifChanged(\"/loudnessCurve\", loudnessCurve=>(\"loudness \" + loudnessCurve));\n\n// default (after earc and arc)\nifChanged(\"/stat/TVSoundSrcDefault\", TVSoundSrcDefault=>(\"settv \" + TVSoundSrcDefault));\n// systemAudio has changed to true\nifChanged(\"/stat/systemAudio\", systemAudio=>(\"cec saf on\"));\n// DTS dialog enhancement\nifChanged(\"/dialogEnh\", dialogEnh=>(\"dialogEnhance \" + dialogEnh));\n\n// fast boot\n//ifChanged(\"/fastStart\", fastStart=>('fastStart ' + (fastStart?\"on\":\"off\")));\nifChanged(\"/fastStart\", fastStart=>('fastStart ' + (fastStart)));\nifChanged(\"/fastStartPassThrough\", fastStartPassThrough=>('vidThru ' + (fastStartPassThrough)));\n\n// turn power on\nif(msg.verb!==\"init\")\n{\n//  ifChanged(\"/powerIsOn\", powerIsOn=>(\"power \"+ (powerIsOn?\"on\":\"off\")));\n    ifChanged(\"/powerIsOn\", powerIsOn=> {\n        postpatch.sgen.sgensw = \"off\";\n        msg.payload.push({\"op\":\"replace\",\"path\":\"/sgen/sgensw\",\"value\":\"off\"});\n        cp.execSync(`/opt/olympia/power-log.sh \\\"node-RED: New powerIsOn value: ${powerIsOn}\\\"`);\n        return (\"power \"+ (powerIsOn?\"on\":\"down\"));\n    });\n}\n// change log persisting\nif(msg.verb!==\"init\")\n{\n    ifChanged(\"/persistLogs\", persistLogs=> {\n        if (persistLogs==\"on\") {\n            cp.execSync(`touch /log2ram.disabled`);\n        } else {\n            cp.execSync(`rm -f /log2ram.disabled`);\n        }\n        return;\n    });\n}\nif(msg.verb!==\"init\")\n{\n    ifChanged(\"/powerAction\", powerAction =>\n    {\n        node.warn(\"powerAction change.\");\n        cp.execSync(`/opt/olympia/power-log.sh \\\"node-RED: New powerAction value: ${powerAction}\\\"`);\n\t    switch(powerAction) {\n\t\t    case 'sleep':\n\t\t        // Linux stays up\n\t\t        node.warn(\"powerAction sleep handled.\");\n\t\t\t    return \"power sleep\";\n\t\t    case 'off':\n\t\t        // Linux shuts down\n\t\t        node.warn(\"powerAction off handled.\");\n\t\t\t    return \"power off\";\n\t\t    case 'reboot':\n\t\t        // Linux reboots\n\t\t        node.warn(\"powerAction reboot handled.\");\n\t\t\t    return \"power reboot\";\n\t\t    case 'down':\n\t\t        // avController follows the specified fastStart\n\t\t        node.warn(\"powerAction down handled.\");\n\t\t\t    return \"power down\";\n\t\t    case 'none':\n\t\t        node.warn(\"powerAction none.\");\n\t\t\t    return;\n\t\t    case 'on':\n\t\t        // is this necessary?\n\t\t        node.warn(\"powerAction on handled.\");\n\t\t\t    return \"power on\";\n\t\t    default:\n\t\t        node.warn(\"invalid powerAction.\");\n\t\t        // msop.powerAction = \"none\";\n\t\t\t    return;\n\t    }\n    });\n}\n\n\n\n/*\n// handle menuSounds(format detect) option for current input\nifChanged(\"/inputs/\" + mso.input +\"/menuSounds\", (menuSounds) => {\n    return (menuSounds?\"menuSounds on\":\"menuSounds  off\")\n});\n*/\nifChanged(\"/crda\", (crda) => {\n    if ((crda === undefined) || (crda === null) || (crda == '')) {\n        crda = '00';\n    }\n    cp.execSync(`iw reg set ${crda}`);\n    \n    var defaultcrda=`# Set REGDOMAIN to a ISO/IEC 3166-1 alpha2 country code so that iw(8) may set\n# the initial regulatory domain setting for IEEE 802.11 devices which operate\n# on this system.\n#\n# Governments assert the right to regulate usage of radio spectrum within\n# their respective territories so make sure you select a ISO/IEC 3166-1 alpha2\n# country code suitable for your location or you may infringe on local\n# legislature. See '/usr/share/zoneinfo/zone.tab' for a table of timezone\n# descriptions containing ISO/IEC 3166-1 alpha2 country codes.\n\nREGDOMAIN=${crda}\n`;\n    var listings = cp.execSync(\"regdbdump /lib/crda/regulatory.bin\", {encoding: 'utf8'}).split(\"\\n\");\n    var countries = listings.filter(a=>a.startsWith('country'));\n    var dfsbycountry = countries.reduce((acc, cur)=>{\n        console.log(cur);\n        var ccode = cur.substring(8,10);\n        var dfs = cur.substring(16);\n        acc[ccode] = dfs;\n        return acc;\n    },{});\n    node.log(dfsbycountry);\n    var dfs;\n    switch(dfsbycountry[crda])\n    {\n        case 'JP':\n            dfs='JP';\n            break;\n        case 'ETSI':\n            dfs='EU';\n            break;\n        default:\n        case 'FCC':\n            dfs='US';\n            break;\n    }\n    var brcmfmac43430txt = \n`# 2.4 GHz, 20 MHz BW mode\nmanfid=0x2d0\nprodid=0x0726\nvendid=0x14e4\ndevid=0x43e2\nboardtype=0x0726\nboardrev=0x1101\nboardnum=22\n#macaddr=00:90:4c:c5:12:38\nsromrev=11\nboardflags=0x00404201\nboardflags3=0x08000000\nxtalfreq=37400\nnocrc=1\nag0=255\naa2g=1\nccode=${dfs}\nregrev=0\npa0itssit=0x20\nextpagain2g=0\npa2ga0=-168,7161,-820\nAvVmid_c0=0x0,0xc8\ncckpwroffset0=5\nmaxp2ga0=0x54\ntxpwrbckof=6\ncckbw202gpo=0\nlegofdmbw202gpo=0x66111111\nmcsbw202gpo=0x77711111\npropbw202gpo=0xdd\nofdmdigfilttype=18\nofdmdigfilttypebe=18\npapdmode=1\npapdvalidtest=1\npacalidx2g=32\npapdepsoffset=-36\npapdendidx=61\n#il0macaddr=00:90:4c:c5:12:38\nwl0id=0x431b\nmuxenab=0x11\n#BT COEX deferral limit setting\n#btc_params 8 45000\n#btc_params 10 20000\nspurconfig=0x3\n`;\n    try {\n        fs.unlinkSync(\"/etc/default/crda\");\n    }\n    catch (exc) {\n        \n    }\n    try {\n        fs.unlinkSync(\"/lib/firmware/brcm/bcm4343w/brcmfmac-sdio.txt\");\n    }\n    catch (exc) {\n        \n    }\n    fs.writeFileSync(\"/etc/default/crda\", defaultcrda, {mode: 0o644 });\n    fs.writeFileSync(\"/lib/firmware/brcm/bcm4343w/brcmfmac-sdio.txt\", brcmfmac43430txt, {mode: 0o644 });\n    cp.execSync(`sync`);\n});\n\nifChanged(\"/inputs/\" + mso.input +\"/formatDetectOption\", (formatDetectOption) => {\n    return (\"formatDetect \" + formatDetectOption);\n}); \n\n// handling UHD settings\n\nifChanged(\"/inputs\", (inputs, oldinputs) => {\n    // Walk the inputs to find HDNI UHD settings.\n    var oldbits, newbits, mask;\n    oldbits = 0;\n    newbits = 0;\n    mask = 1;\n    Object.keys(inputs).forEach(input => {\n        if (mso.inputs[input].uhd !== undefined) {\n            //node.warn('UHD: ' + input + ' was ' + mso.inputs[input].uhd + ' s/b ' + postpatch.inputs[input].uhd);\n            if (mso.inputs[input].uhd) {\n                oldbits += mask;\n            }\n            if (postpatch.inputs[input].uhd) {\n                newbits += mask;\n            }\n            mask *= 2;\n        }\n    });\n    //node.warn('UHD: oldbits ' + oldbits + ' newbits ' + newbits);\n    var cmd = '';\n    if ((oldbits != newbits) || (msg.verb==\"init\")) {\n        cmd = 'forum 0x' + newbits.toString(16);\n        //node.warn('UHD: cmd ' + cmd);\n        return cmd; // Send to avController\n    } else {\n        return false;\n    }\n});\n\n\n/*\n// input change -- send menuSounds command\nifChanged(\"/input\", (inp)=>{\n    var ms;\n    ms =mso.inputs[inp].menuSounds;\n //   node.warn('ms =' + ms);\n    return (ms?\"menuSounds on\":\"menuSounds  off\")\n});\n*/\n\n// input change -- send formatdetect command\nifChanged(\"/input\", (inp)=>{\n    var ms;\n    ms =mso.inputs[inp].formatDetectOption;\n   // node.warn(ms);\n    return (\"formatDetect \" + ms);\n}); \n\nifChanged(\"/input\", (inp)=>{\n    sysconf = global.get('sysconf');\n\n    // see the definition of sysconf.irInputGrp in settings.js\n    if(sysconf.irInputGrp.grps[inp] !== undefined) {\n        // inp has a rotation group\n        // update /svronly/lastins/\n        postpatch.svronly.lastin = mso.input;\n        // node.warn(\n        // inp + ' is in input group ' + sysconf.irInputGrp.grps[inp].grp + \"\\n\" + \n        // 'postpatch.svronly.lastin: ' + postpatch.svronly.lastin\n        // );\n    } else {\n        node.warn(inp + ' has no input group');\n    }\n//    node.warn('new input is ' + inp);\n    return(inp);\n});\n\n\n// audio_management\nifChanged(\"/input\", (inp,oldinp) =>{\n   // Manage systemd services for input handling\n   // Roon is self-managed by MSO code in raat\n   switch(oldinp) {\n        case \"b\":\n            cp.execSync(`systemctl stop bluealsa-aplay`);\n            break;\n        case \"usb\":\n            cp.execSync(`systemctl stop usbaudio`);\n            break;\n   }\n   switch(inp) {\n        case \"b\":\n            cp.execSync(`systemctl start bluealsa-aplay`);\n            break;\n        case \"usb\":\n            usbplugstate=fs.readFileSync(\"/sys/class/udc/musb-hdrc.1.auto/device/mode\", {encoding:'utf8'}) == 'b_peripheral\\n';\n            if(usbplugstate) cp.execSync(`systemctl start usbaudio`);\n            break;\n   }\n});\n\n\n// Inputs\n//ifChanged(\"/input\", (inp, oldinp)=>{\n//    node.warn(\"=== Inp is \" + inp);\n//    node.warn(mso.inputs[inp]);\n//    if (mso.inputs[inp].uhd !== undefined) {\n//        node.warn(`was on ${oldinp} uhd=${mso.inputs[oldinp]?mso.inputs[oldinp].uhd:(\"(mso.inputs[\"+oldinp+\"] not defined)\")}`);\n//        node.warn('will be ' + inp + ' uhd=' + mso.inputs[inp].uhd);\n//        return('#uhd='+mso.inputs[inp].uhd);\n//        return(false);\n//    } else {\n//        // not HDMI inputs, do nothing\n//        return(false);\n//    }\n//});\n\n//ifChanged(\"/inputs/\"+mso.input+\"/uhd\", uhd=>{\n//    return(\"#on current input uhd=\"+uhd);\n//});\n\n\n\nifChanged(\"/inputs\", ()=>{\n//    node.send([null,null,null,{\"payload\":JSON.stringify(postp.get(\"/inputs\"))}]);\n    var data = {\"cmd\" : \"friendlynames\", \"names\" : JSON.stringify(postp.get(\"/inputs\"))};\n    node.send([null,null,null,{\"payload\":JSON.stringify(data)}]);\n});\n\n\n// Network General Settings\n[\"eth0\",\"wlan0\"].forEach(nif=>ifChanged(\"/network/\"+nif,netinfo=>{\n    node.warn(\"Check for nif \" + nif);\n    if(netinfo.dhcp)\n    {\n        // DHCP configuration\n        node.warn(\"DHCP Config check for \" + nif);\n    }\n    else\n    {\n        // Static IP\n        node.warn(\"Static IP Config check for \" + nif);\n    }\n    if(nif==\"wlan0\") {\n        // Wi-Fi\n        node.log(\"Wi-Fi Config check for \" + nif);\n    }\n    }\n))\n\n// FP brightness\nifChanged(\"/hw/fpBright\", fpBright=>(\"fpBright \" + fpBright));\n\n// PEQ\nif(msg.verb!==\"init\") {\n    // check only not 'init' to avoid flooding avController\n\n    ifChanged(\"/peq/slots\", (slotsNew, slotOld) => {\n        // slots is array of { channels {lf, rf, ...}, }\n        // Walk the groups to find which is different.\n        slotsNew.forEach((slotNew,index) => {\n            Object.keys(slotsNew[index].channels).forEach((channel) => {\n                var changed;\n                changed = ifChanged(\"/peq/slots/\"+index+\"/channels/\"+channel+\"/Fc\", (FcNew, FcOld) => {\n                    return (\"peq \"+channel+\" \"+index+\" \"+\n                        FcNew+\" \"+\n                        slotsNew[index].channels[channel].gaindB+\" \"+\n                        slotsNew[index].channels[channel].Q+\" \"+\n                        slotsNew[index].channels[channel].FilterType);\n                });\n                if(!changed) {\n                    // check only if Fc didn't change; otherwise gaindB and Q will have been sent\n                    changed = ifChanged(\"/peq/slots/\"+index+\"/channels/\"+channel+\"/gaindB\", (gaindBNew, gaindBOld) => {\n                        return (\"peq \"+channel+\" \"+index+\" \"+\n                            slotsNew[index].channels[channel].Fc+\" \"+\n                            gaindBNew+\" \"+\n                            slotsNew[index].channels[channel].Q+\" \"+\n                            slotsNew[index].channels[channel].FilterType);\n                    });\n                    if(!changed) {\n                        // check only if gaindB didn't change; otherwise Q will have been sent\n                        changed = ifChanged(\"/peq/slots/\"+index+\"/channels/\"+channel+\"/Q\", (QNew, QOld) => {\n                            return (\"peq \"+channel+\" \"+index+\" \"+\n                                slotsNew[index].channels[channel].Fc+\" \"+\n                                slotsNew[index].channels[channel].gaindB+\" \"+\n                                QNew+\" \"+\n                                slotsNew[index].channels[channel].FilterType);\n                        });\n                    }\n                    if(!changed) {\n                        // check only if Q didn't change; otherwise FilterType will have been sent\n                        changed = ifChanged(\"/peq/slots/\"+index+\"/channels/\"+channel+\"/FilterType\", (FilterTypeNew, FilterTypeOLD) => {\n                            return (\"peq \"+channel+\" \"+index+\" \"+\n                                slotsNew[index].channels[channel].Fc+\" \"+\n                                slotsNew[index].channels[channel].gaindB+\" \"+\n                                slotsNew[index].channels[channel].Q+\" \"+\n                                FilterTypeNew);\n                        });\n                    }\n                }\n            });\n        });\n    });\n}\n\nif(msg.verb!==\"init\"){\n  ifChanged(\"/unitname\", (newname)=> {\n    // sanitize host name to only the allowed set to prevent bash command injection\n    newname = newname.replace(/[^ a-zA-Z0-9'!#_+.,\\/-]/g,'');\n    postpatch.unitname = newname;\n    msg.payload.forEach((el,index)=>{\n        if(el.path == '/unitname') {\n           el.value = newname;\n        }\n    })\n\n    node.warn(\"updating unitname to \" + newname);\n    fs.writeFileSync(\"/var/lib/olympia/unitname.txt\", newname);\n    cp.execSync(`hostnamectl set-hostname \\\"${newname}\\\"`);\n    cp.execSync(`hostnamectl set-hostname --pretty \\\"${newname}\\\"`);\n    // ; true to force success exit code so node-RED won't quit due to nothing to kill\n    cp.execSync(\"killall server_olympia ; true\");  // restart Dirac server\n    cp.execSync(\"killall olympia_bc_multi_section ; true\");  // restart Dirac server BC edition\n    cp.execSync(\"killall raat_app ; true\");     // restart roon server\n    // cp.execSync(\"hostnamectl set-hostname \" + '\\\"' + newname + '\\\"');\n    // cp.execSync(\"hostnamectl set-hostname --pretty \" + '\\\"' + newname + '\\\"');\n\n    node.send([null,null,null,{\"payload\" : \"\"}]);\n  });\n}\n\nif(msg.verb ==\"init\") {\n    node.warn(\"initializing all 16 channels on startup\")\n   \n    // slots is array of { channels {lf, rf, ...}, }\n    // Walk the groups t\n    for (indexl = 0; indexl < 16; indexl ++) {\n        var concat  = \"\";\n        var basePtr = \"/peq/slots/\"+indexl;\n        //node.warn ('ch ' + indexl)\n        Object.keys(postp.get(basePtr).channels).forEach((channel) => {\n            var chanPtr = basePtr + \"/channels/\" + channel;\n            concat  += `peq ${channel} ${indexl} ${postp.get(chanPtr + \"/Fc\")} `;\n            concat  += `${postp.get(chanPtr + \"/gaindB\")} `;\n            concat  += `${postp.get(chanPtr + \"/Q\")} `;\n            concat  += `${postp.get(chanPtr + \"/FilterType\") +\"&\"}`;\n             });\n        //node.warn (concat)\n        sendToAvController(concat);\n    }\n}\n\n// PEQ\nif(msg.verb!==\"init\") {\n    // send single band of PEQ \n    ifChanged(\"/peq/currentpeqslot\", indexl => {\n        // slots is array of { channels {lf, rf, ...}, }\n        // Walk the groups t\n        // node.warn(\"change to single active slot for peq \") \n        var concat  = \"\";\n        var basePtr = \"/peq/slots/\"+indexl;\n        // node.warn (indexl)\n        Object.keys(postp.get(basePtr).channels).forEach((channel) => {\n            var chanPtr = basePtr + \"/channels/\" + channel;\n            concat  += `peq ${channel} ${indexl} ${postp.get(chanPtr + \"/Fc\")} `;\n            concat  += `${postp.get(chanPtr + \"/gaindB\")} `;\n            concat  += `${postp.get(chanPtr + \"/Q\")} `;\n            concat  += `${postp.get(chanPtr + \"/FilterType\") +\"&\"}`;\n             });\n        // node.warn (concat)\n        return (concat);\n            });\n}\n\n// Dirac slot change starts here.\n// First apply the slow mute.\n// Then adjust the delay and trim, and load the new slot.\n// Finally remove smute (first checking the mso state of mute)\n{\n    ifChanged(\"/cal/currentdiracslot\", indexl => {\n        return (\"smute on\");\n    });\n}\n{   // old comment mentions #537.\n    ifChanged(\"/cal/currentdiracslot\", indexl => {\n        // node.warn(\"change to single active slot for delay \") \n        var concat  = \"\";\n        var basePtr = \"/cal/slots/\"+indexl;\n        // node.warn (indexl)\n        Object.keys(postp.get(basePtr).channels).forEach((channel) => {\n            var chanPtr = basePtr + \"/channels/\" + channel;\n            concat  += `del ${channel} ${postp.get(chanPtr + \"/delay\") +\"&\"}`;\n        })\n        // node.warn (concat)\n        return (concat);\n    });\n}\n{\n    ifChanged(\"/cal/currentdiracslot\", indexl => {\n        // node.warn(\"change to single active slot for trim \") \n        var concat2 = \"\";\n        var basePtr = \"/cal/slots/\"+indexl;\n        // node.warn (indexl)\n        Object.keys(postp.get(basePtr).channels).forEach((channel) => {\n            var chanPtr = basePtr + \"/channels/\" + channel;\n            concat2 += `trim ${channel} ${postp.get(chanPtr + \"/trim\") +\"&\"}`;\n        })\n        // node.warn (concat2);\n        return (concat2);\n    });\n}\n\n// Calibration Slot (Forces Dirac on)\nifChanged(\"/cal/currentdiracslot\", slot=>{\n    if(msg.verb!==\"init\") {\n        // when taking action outside of commander framework (via patching)\n        // must take these actions: 1. update postpatch, 2. push msoupdate, 3. command avController\n        postpatch.cal.diracactive = 'on';\n        msg.payload.push({\"op\":\"replace\",\"path\":\"/cal/diracactive\",\"value\":\"on\"});\n    }\n    return \"dirac \" + slot;\n});\n\n\nifChanged(\"/cal/diracactive\", diracactive =>\n{\n\tswitch(diracactive) {\n\t\tcase 'on':\n\t\t    //node.warn(\"diracactive changed to on.\");\n\t\t\treturn \"dirac bypass off&dirac on\";\n\t\tcase 'bypass':\n\t\tcase 'bypass on':\n\t\t    //node.warn(\"diracactive changed to bypass.\");\n\t\t\treturn \"dirac bypass on\";\n\t\tdefault:\n\t\t    //node.warn(\"diracactive changed to off.\");\n\t\t\treturn \"dirac off\";\n\t}\n});\n\nifChanged(\"/cal/currentdiracslot\", indexl => {\n    // Alfred had one observation and Chuck co-witnessed of making zipper noise\n    // moving it here makes sense, even though moving it back doesn't duplicate\n    // A change to currentdiracslot also changes diracactive, but diracactive\n    // can also change without changing currentdiracslot so 'smute off' won't be active\n    if (mso.muted === false)\n        return (\"smute off\");\n});\n\n// End of Dirac slot update\n\n\n// #537:  Is this necessary?  When does this happen?\n// calibration overrides - user delay and trim settings\n// After init, check to see if the user has changed del/trim \n// of the currently selected slow and send commands if changed.\n// However, Object calls are expensive in time so may be not \n// evaluating all slots will shorten processing time?\n// (Don't change in a rush)\n\nif(msg.verb!==\"init\") {\n    // check only not 'init' to avoid flooding avController\n    //node.warn(\"in cal \")\n    ifChanged(\"/cal/slots\", (slotsNew, slotOld) => {\n        // slots is array of { channels {lf, rf, ...}, }\n        // Walk the groups to find which is different.\n        slotsNew.forEach((slotNew,index) => {\n            var changed; \n            var concat = \"\";\n            var basePtr = \"/cal/slots/\"+index;\n            // node.warn (index)\n            Object.keys(slotsNew[index].channels).forEach((channel) => {\n                var chanPtr = basePtr + \"/channels/\" + channel;\n                concat += `del ${channel} ${postp.get(chanPtr + \"/delay\") +\"&\"}`;\n                //if (index === 0) node.warn (concat);\n                // two changed and returns in sequence works because only one or the other will be true - jep\n                changed = ifChanged(chanPtr + \"/delay\", (delayNew, delayOld) => {\n                    return (`del ${channel} ${delayNew} `);\n                });\n                changed = ifChanged(chanPtr + \"/trim\", (trimNew, trimOld) => {\n                    return (`trim ${channel} ${trimNew} `);\n                });\n            //if (index === 0) node.warn (concat);               \n            });\n         //   node.warn (concat);\n        });\n    });\n}\n\n\n// Mute\nifChanged(\"/muted\", muted=>('smute ' + (muted?\"on\":\"off\")));\n\nifChanged(\"/svronly/resetmso\", resetmso=>{\n// talk to Jon for a better implementation\nnode.warn(\"RESETMSO \"+resetmso + ' -- ' + JSON.stringify(msg.payload,null,2));\n    if ((resetmso === undefined) || (resetmso === null)) {\n        msg.payload.forEach((el,index)=>{\n            if(el.path == '/svronly/resetmso') {\n               el.value = false;\n            }\n        });\n        postpatch.svronly.resetmso = false;\n    } else {\n        node.warn(\"RESETMSO \"+resetmso + ' -- null: NO ACTION TAKEN');\n    }\n});\n\n\nglobal.set('mso', postpatch);\nif(msg.verb=='init') {\n    sendToAvController(\"init complete\");\n    return;\n}\n// It is necessary to delete msg._session to turn the response into a broadcast.\ndelete msg._session;\n\n//console.log(':T:ELAPSE: ' + (new Date() - global.get('newverb')) + ' ms exit cmdr');\n\nreturn msg;\n",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 320,
+        "y": 180,
+        "wires": [
+            [
+                "fac2ce0a.1a5c7"
+            ],
+            [
+                "d7d031d.d9565d",
+                "90ef182d.2732c8"
+            ],
+            [
+                "a30b2f71.1e12d"
+            ],
+            [
+                "84981529.dafa48"
+            ]
+        ],
+        "inputLabels": [
+            "Patch In"
+        ],
+        "outputLabels": [
+            "Patch Pass-Through",
+            "AVCUI Out",
+            "Error Out",
+            ""
+        ]
+    },
+    {
+        "id": "a30b2f71.1e12d",
+        "type": "websocket out",
+        "z": "d9723a24.504ca8",
+        "name": "Error Return",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 447,
+        "y": 339,
+        "wires": []
+    },
+    {
+        "id": "d7d031d.d9565d",
+        "type": "debug",
+        "z": "d9723a24.504ca8",
+        "name": "AVCUI cmd",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "x": 757,
+        "y": 304,
+        "wires": []
+    },
+    {
+        "id": "90ef182d.2732c8",
+        "type": "posixmq-write",
+        "z": "d9723a24.504ca8",
+        "msgname": "/mq__console",
+        "msgsize": "1024",
+        "maxmsgs": "60",
+        "create": false,
+        "ofprotect": false,
+        "x": 740,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "6bc2771a.1fb3a8",
+        "type": "posixmq-read",
+        "z": "f3732c66.fe9f9",
+        "msgname": "/mq__mso",
+        "msgsize": "256",
+        "maxmsgs": "500",
+        "create": false,
+        "x": 116,
+        "y": 47,
+        "wires": [
+            [
+                "39ff192f.0f12e6"
+            ]
+        ]
+    },
+    {
+        "id": "39ff192f.0f12e6",
+        "type": "change",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "fromController",
+                "pt": "msg",
+                "to": "true",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "_session",
+                "pt": "msg",
+                "to": "no-one",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 338,
+        "y": 48,
+        "wires": [
+            [
+                "5d5aa7d7.955738"
+            ]
+        ]
+    },
+    {
+        "id": "46957ecf.19aac",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "avcui passthrough",
+        "links": [
+            "5ca06940.246fa8"
+        ],
+        "x": 835,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "5ca06940.246fa8",
+        "type": "link in",
+        "z": "d9723a24.504ca8",
+        "name": "avcui receiver",
+        "links": [
+            "46957ecf.19aac"
+        ],
+        "x": 288,
+        "y": 431,
+        "wires": [
+            [
+                "8161dcd7.7e28b"
+            ]
+        ]
+    },
+    {
+        "id": "8161dcd7.7e28b",
+        "type": "function",
+        "z": "d9723a24.504ca8",
+        "name": "Inject Newline",
+        "func": "msg.payload += \"\\n\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 486,
+        "y": 417,
+        "wires": [
+            [
+                "90ef182d.2732c8"
+            ]
+        ]
+    },
+    {
+        "id": "e35a1a72.5f96e8",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "HostIP Inject",
+        "func": "var cp = global.get('cp'); // require('child-process');\n// Process the output of ip command to an object.\nvar ipaddrs = cp.execSync('ip -o addr show scope global',{encoding:\"utf8\"} ).split(\"\\n\").filter(a=>(a!==\"\"));\nmsg.payload.ipInfo = ipaddrs.reduce((acc, cur)=>{\n    cur=cur.split(\"\\\\\")[0].split(\" \").filter(a=>(a!==\"\"));\n    if(acc[cur[1]] === undefined) acc[cur[1]] = [];\n    addrInfo = {\n        family:cur[2],\n        address:cur[3].split(\"/\")[0],\n        prefixlen:cur[3].split(\"/\")[1],\n        label:cur[8]\n    };\n    acc[cur[1]].push(addrInfo);\n    return acc;\n},{});\n\nif(msg.payload.ipInfo[\"eth0\"])\n{\n    msg.payload.hostip = msg.payload.ipInfo[\"eth0\"][0].address;\n}\nelse \n    msg.payload.hostip = \"Ethernet Not Connected\";\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 990,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b9d7c609.b41358",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "MSO Fixup",
+        "func": "try{\nvar timestart = new Date();\njsonpatch = global.get('jsonpatch');\nmso = global.get('mso');\npointer = global.get('pointer');\nmsop = pointer(mso);\ncp = global.get('cp');\nfs = global.get('fs');\n\n\n// Polyfill for String.startsWith()\nif (!String.prototype.startsWith) {\n    Object.defineProperty(String.prototype, 'startsWith', {\n        value: function(search, pos) {\n            pos = !pos || pos < 0 ? 0 : +pos;\n            return this.substring(pos, pos + search.length) === search;\n        }\n    });\n}\n\n// MSO Cleanup\nvar observer = jsonpatch.observe(mso);\n\n/** Check for an item's existance and correct type(s). Reset to default if not of a correct type.\n * \n * @param obj The item that is to be checked in mso, as a JSON pointer.\n * @param def The default value. May be any value. \n *   If undefined, delete will be called on obj if obj's constructor.name does not appear in addtype. \n *   If it is an object or array, _it will be assigned by reference_.\n * @param addtype Additional types or literals that may be allowed for the value, \n *   other than def.constructor.name. \n *   If more than one, use an array. (For an Array literal, enclose in an array.) \n *   Types are specified by name: String, Array, Object, Number, Boolean.\n * @param mustLiteral True to only allow literal match of def or addtype (Type match only disallowed)\n */\nfunction checkItem(obj, def, addtype, mustLiteral) {\n    try{\n        x = msop.get(obj);\n    }\n    catch(exc)\n    {\n        x=undefined;\n        /* console.log(\"Not in MSO:\", JSON.stringify(obj), \". addtype: \", JSON.stringify(addtype)); */\n    }\n    \n    // Set up acceptable types.\n    if (addtype === undefined) addtype = [];\n    if ((addtype === null) || (addtype.constructor !== Array)) addtype = [addtype]; // This would use .flat() but that isn't available in this version of NodeJS\n    if (def !== undefined) {\n        addtype.push(def);\n        if(def!==null) addtype.push(def.constructor.name); // Allow the type of the default value.\n    }\n\n    addtype.forEach(b=>{if(b!==null && b.name) b=b.name});\n\n    if (x !== undefined) { // Undefined check\n        if(addtype.includes(x)) return; // Literal check\n        if ((!mustLiteral) && (x!==null) && addtype.includes(x.constructor.name)) return; // Type check.\n    }\n\n    // Reset value (Failed all checks)\n    if(def === undefined) {\n        msop.remove(obj); \n        node.warn('checkItem failed: remove '+obj);\n    } else {\n        msop.set(obj, def);\n        node.warn('checkItem failed: set \"'+obj+'\" to '+JSON.stringify(def));\n    }\n}\n\n/** Purge a deprecated MSO item from the MSO.\n * \n * @param obj The MSO property to be deprecated.\n */\nfunction deprecated(obj) {\n    if(msop.has(obj)) msop.remove(obj);\n}\n\n// Generate all speaker IDs.\nvar bmg = {\n    \"lr\": [\"lf\", \"rf\"],\n    \"c\": [\"c\"],\n    \"lrs\": [\"ls\", \"rs\"],\n    \"lrb\": [\"lb\", \"rb\"],\n    \"lrw\": [\"lw\", \"rw\"],\n    \"sub1\": [\"sub1\"],\n    \"sub2\": [\"sub2\"],\n    \"sub3\": [\"sub3\"],\n    \"sub4\": [\"sub4\"],\n    \"sub5\": [\"sub5\"],\n    \"lrtf\": [\"ltf\", \"rtf\"],\n    \"lrtm\": [\"ltm\", \"rtm\"],\n    \"lrtr\": [\"ltr\", \"rtr\"],\n    \"lrhf\": [\"lfh\", \"rfh\"],\n    \"lrhr\": [\"lhb\", \"rhb\"]\n}\n\n// Generate an array of channel names for all bass management groups. This is a hack because .flat() wasn't available in NodeJS.\n//spkid = [\"lf\", \"rf\", \"c\", \"lfh\", \"lw\", \"rw\", \"ltm\", \"rtm\", \"ls\", \"rs\", \"lb\", \"rb\", \"sub1\", \"sub2\", \"ltf\", \"rtf\", \"ls1\", \"rs1\", \"lrs1\", \"rrs1\", \"lhb\", \"rhb\", \"rfh\", \"cs\", \"lcsur\", \"rcsur\", \"ltr\", \"rtr\", \"lrs2\", \"rrs2\", \"lscr\", \"rscr\"];\nspkid = [\"lf\", \"rf\", \"c\", \"sub1\", \"sub2\", \"sub3\", \"sub4\", \"sub5\", \"ls\", \"rs\", \"lb\", \"rb\", \"ltf\", \"rtf\", \"ltm\", \"rtm\", \"ltr\", \"rtr\", \"lw\", \"rw\", \"lfh\", \"rfh\", \"lhb\", \"rhb\"];\n// The per-channel prototype\ndeltrimproto = { \"caldelay\": 0, \"caltrim\": 0, \"delay\": 0, \"trim\": 0 };\npeqproto = { \"Fc\": 100, \"gaindB\": 0, \"Q\": 1, \"FilterType\": 0};\n\n// Create an object containing one key per channel with the del/trim prototype as its default value.\nchanproto = spkid.reduce((x, y) => { x[y] = deltrimproto; return x }, {});\npeqchanproto = spkid.reduce((x, y) => { x[y] = peqproto; return x }, {});\n// Prototype: \nslotproto = { \"checksum\": null, \"channels\": chanproto };\npeqbandproto = { \"checksum\": null, \"channels\": peqchanproto };\n// Existance and type enforcement.\ncheckItem(\"/cal\", { \"lipsync\": 0 });\ncheckItem(\"/cal/lipsync\", 0);\ncheckItem(\"/cal/vpl\", -100);\ncheckItem(\"/cal/vph\", 0);\ncheckItem(\"/cal/ampsense\",1.6);\ncheckItem(\"/cal/headroom\",12);\ncheckItem(\"/cal/slots\", []);\ncheckItem(\"/cal/diracactive\", \"off\");\ncheckItem(\"/cal/speakerConfigMismatch\", false);\ncheckItem(\"/cal/currentdiracslot\", 0);\ncheckItem(\"/cal/caltoolconnected\", false);\n// We will always have 6 slots (This will forcibly change it under all circumstances)\nmso.cal.slots.length = 6;\n// Fix any problems in slots\nfor (i = 0; i < mso.cal.slots.length; i++) {\n    var sp = \"/cal/slots/\" + i;\n    //node.warn(sp);\n    checkItem(sp, Object.assign({}, slotproto)); // Use a disposable copy of slotproto due to pass-by-reference\n    checkItem(sp + \"/name\", \"Slot \" + (i + 1));\n    checkItem(sp + \"/valid\", false);\n    checkItem(sp + \"/hasBCFilter\", false);\n    checkItem(sp + \"/channels\", Object.assign({}, chanproto));\n    checkItem(sp + \"/checksum\", null, Number); // May be a number as well.\n    spkid.forEach(spk => {\n        checkItem(sp + \"/channels/\" + spk, Object.assign({}, deltrimproto));\n        Object.keys(deltrimproto).forEach(z => checkItem(sp + \"/channels/\" + spk + \"/\" + z, 0)); // Check all items in the deltrim prototype.\n    });\n}\n//node.warn(\"mso.cal: \" + JSON.stringify(mso.cal,null,4));\n\n// Default mso.loudnessCal.  APM gets 140-loudnessCal.\ncheckItem(\"/loudnessCal\",80);\n\n// Signal generator setup\ndeprecated(\"/sgensw\");\n// Signal generator setup\ndeprecated(\"/sgen/signal\");\n// Signal generator setup\ndeprecated(\"/sgen/sgensw\");\ncheckItem(\"/sgen/sgensw\",\"off\");\n// Signal Generator must be off\nmso.sgen.sgensw = \"off\";\nnode.warn(\"/sgen/sgensw: \"+mso.sgen.sgensw);\ncheckItem(\"/sgen/select\",\"lf\");\ncheckItem(\"/sgen/select2\",\"rf\");\ncheckItem(\"/sgen/signalType\",\"thx\");\ncheckItem(\"/sgen/sinehz\",440);\n// Force to -20 dBFS on restart\ndeprecated(\"/sgen/sinedb\");\ncheckItem(\"/sgen/sinedb\",-20);\n\n// Existence and type enforcement for PEQ.\ncheckItem(\"/peq\", {});\ncheckItem(\"/peq/currentpeqslot\", 0);\ncheckItem(\"/peq/slots\", []);\n// We will always have 16 slots (This will forcibly change it under all circumstances)\nmso.peq.slots.length = 16;\n// Fix any problems in slots\nfor (i = 0; i < mso.peq.slots.length; i++) {\n    var sp = \"/peq/slots/\" + i;\n    // node.warn(sp);\n    checkItem(sp, Object.assign({}, peqbandproto)); // Use a disposable copy of peqbandproto due to pass-by-reference\n    checkItem(sp + \"/name\", \"BAND \" + (i + 1));\n    checkItem(sp + \"/valid\", false);\n    checkItem(sp + \"/channels\", Object.assign({}, peqchanproto));\n    checkItem(sp + \"/checksum\", null, Number); // May be a number as well.\n    spkid.forEach(spk => {\n        checkItem(sp + \"/channels/\" + spk, Object.assign({}, peqproto));\n        Object.keys(peqproto).forEach(z => checkItem(sp + \"/channels/\" + spk + \"/\" + z, 0)); // Check all items in the deltrim prototype.\n    });\n}\n//node.warn(\"mso.peq: \" + JSON.stringify(mso.peq,null,4));\n\ncheckItem(\"/unitname\", \"HTP-1\");\nvar unm = mso.unitname;\nnode.warn (unm);\ncp.execSync(\"hostnamectl set-hostname \" + '\\\"' + unm.replace(/([\"\\s'$`\\\\])/g,'\\\\$1') + '\\\"' );\ncp.execSync(\"hostnamectl set-hostname --pretty \" + '\\\"' + unm.replace(/([\"\\s'$`\\\\])/g,'\\\\$1') + '\\\"' );\n// msop.set(\"/unitname\", cp.execSync(\"hostnamectl set-hostname --pretty\", {encoding: 'utf8'}));\n//if(!msop.get(\"/unitname\")) msop.set(\"/unitname\", cp.execSync(\"hostnamectl set-hostname --static\", {encoding: 'utf8'}));\n\ncheckItem(\"/bassenhance\",\"off\");\ncheckItem(\"/bmmmode\", 11);\ncheckItem(\"/speakers\", { \"groups\": {}, \"uppermode\": \"top\" });\ncheckItem(\"/speakers/uppermode\", \"top\", \"height\", true); // May be \"top\" or \"height\", nothing else.\ncheckItem(\"/speakers/groups\", {});\nObject.keys(bmg).forEach(g => {\n    n = \"/speakers/groups/\" + g;\n    checkItem(n,{});\n    if(g!=\"lr\") checkItem(n+\"/present\", false);\n    /* checkItem(obj, def, addtype, mustLiteral) */\n    checkItem(n+\"/fc\", 80, Number, false); // Delete fc if not a number.\n    checkItem(n+\"/size\",\"l\",[\"s\",\"d\"],true); // Must be \"l\" or \"s\", make \"l\" if neither\n});\ncheckItem(\"/speakers/mapping\", new Array(16));\n\ncheckItem(\"/debugMask\", 0);\ncheckItem(\"/eq\", {});\ncheckItem(\"/eq/tc\", false);\ncheckItem(\"/eq/treble\", {});\ncheckItem(\"/eq/treble/level\", 0.0);\ncheckItem(\"/eq/treble/freq\", 501);\ncheckItem(\"/eq/bass\", {});\ncheckItem(\"/eq/bass/level\", 0.0);\ncheckItem(\"/eq/bass/freq\", 100);\n\ncheckItem(\"/peq\", {});\ncheckItem(\"/peq/peqsw\", false);\n\ncheckItem(\"/CEC\", {});\ncheckItem(\"/CEC/cecOnSw\", \"off\");\ncheckItem(\"/CEC/allowpwrk\", true);\ncheckItem(\"/CEC/allowvolk\", true);\ncheckItem(\"/CEC/allowsaf\", true);\ncheckItem(\"/CEC/allowinp\", true);\ncheckItem(\"/CEC/allowstdb\", true);\ndeprecated(\"/inputs/arc\");\n\n// I have to deprecate roon so the name stays \"roon ready\"\n// I have to deprecated usb and b so the order stays the same.\n// This means you can't change the name of USB or BT.\n// Chuck now thinks this is not necessary: deprecated(\"/inputs/usb\");\n// Chuck now thinks this is not necessary: deprecated(\"/inputs/b\");\ndeprecated(\"/inputs/roon/label\");  // ensures Roon Ready as the name.\n\ncheckItem(\"/inputs\", {});\nvar inputs = [];\nfor(i=1;i<=8;i++) inputs.push({\"inp\":\"h\"+i, \"label\":\"HDMI \"+i, \"uhd\":true});\ninputs.push({\"inp\":\"tv\", \"label\":\"TV\"});\nfor(i=1;i<=2;i++) inputs.push({\"inp\":\"a\"+i, \"label\":\"Analog \"+i});\nfor(i=1;i<=3;i++) inputs.push({\"inp\":\"spdif\"+i, \"label\":\"Coax \"+i});\nfor(i=1;i<=3;i++) inputs.push({\"inp\":\"optical\"+i, \"label\":\"Optical \"+i});\ninputs.push({\"inp\":\"aes\", \"label\":\"AES/EBU\"});\ninputs.push({\"inp\":\"roon\", \"label\":\"Roon Ready\"});\ninputs.push({\"inp\":\"usb\", \"label\":\"USB\"});\ninputs.push({\"inp\":\"b\", \"label\":\"Bluetooth\"});\ninputs.forEach(input=>{\n    checkItem(\"/inputs/\"+input.inp, {});\n    checkItem(\"/inputs/\"+input.inp+\"/label\", input.label);\n//    checkItem(\"/inputs/\"+input.inp+\"/visible\", false); **  commented out see next group of checkItems for this **\n    checkItem(\"/inputs/\"+input.inp+\"/disable\", false);\n    checkItem(\"/inputs/\"+input.inp+\"/gain\", 0);\n    if(input.uhd) checkItem(\"/inputs/\"+input.inp+\"/uhd\", input.uhd);\n//    checkItem(\"/inputs/\"+input.inp+\"/menuSounds\", 3); **  commented out see next group of checkItems for this **\n//    checkItem(\"/inputs/\"+input.inp+\"/formatDetectOption\", \"auto\");\n});\n\n\n// set defaults for inputs visible on home page\ncheckItem(\"/inputs/h1/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/h2/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/h3/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/h4/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/h5/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/h6/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/h7/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/h8/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/a1/formatDetectOption\", \"biased\");\ncheckItem(\"/inputs/a2/formatDetectOption\", \"biased\");\ncheckItem(\"/inputs/aes/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/b/formatDetectOption\", \"biased\");\ncheckItem(\"/inputs/optical1/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/optical2/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/optical3/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/roon/formatDetectOption\", \"biased\");\ncheckItem(\"/inputs/spdif1/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/spdif2/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/spdif3/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/tv/formatDetectOption\", \"auto\");\ncheckItem(\"/inputs/usb/formatDetectOption\", \"biased\");\n\ncheckItem(\"/inputs/h1/visible\", true);\ncheckItem(\"/inputs/h2/visible\", true);\ncheckItem(\"/inputs/h3/visible\", false);\ncheckItem(\"/inputs/h4/visible\", false);\ncheckItem(\"/inputs/h5/visible\", false);\ncheckItem(\"/inputs/h6/visible\", false);\ncheckItem(\"/inputs/h7/visible\", false);\ncheckItem(\"/inputs/h8/visible\", true);\ncheckItem(\"/inputs/a1/visible\", true);\ncheckItem(\"/inputs/a2/visible\", false);\ncheckItem(\"/inputs/aes/visible\", false);\ncheckItem(\"/inputs/b/visible\", true);\ncheckItem(\"/inputs/optical1/visible\", true);\ncheckItem(\"/inputs/optical2/visible\", false);\ncheckItem(\"/inputs/optical3/visible\", false);\ncheckItem(\"/inputs/roon/visible\", true);\ncheckItem(\"/inputs/spdif1/visible\", true);\ncheckItem(\"/inputs/spdif2/visible\", false);\ncheckItem(\"/inputs/spdif3/visible\", false);\ncheckItem(\"/inputs/tv/visible\", true);\ncheckItem(\"/inputs/usb/visible\", false);\n\ncheckItem(\"/inputs/h1/menuSounds\", 3);\ncheckItem(\"/inputs/h2/menuSounds\", 3);\ncheckItem(\"/inputs/h3/menuSounds\", 3);\ncheckItem(\"/inputs/h4/menuSounds\", 3);\ncheckItem(\"/inputs/h5/menuSounds\", 3);\ncheckItem(\"/inputs/h6/menuSounds\", 3);\ncheckItem(\"/inputs/h7/menuSounds\", 3);\ncheckItem(\"/inputs/h8/menuSounds\", 3);\ncheckItem(\"/inputs/a1/menuSounds\", 1);\ncheckItem(\"/inputs/a2/menuSounds\", 1);\ncheckItem(\"/inputs/aes/menuSounds\", 2);\ncheckItem(\"/inputs/b/menuSounds\", 1);\ncheckItem(\"/inputs/optical1/menuSounds\", 2);\ncheckItem(\"/inputs/optical2/menuSounds\", 2);\ncheckItem(\"/inputs/optical3/menuSounds\", 2);\ncheckItem(\"/inputs/roon/menuSounds\", 1);\ncheckItem(\"/inputs/spdif1/menuSounds\", 2);\ncheckItem(\"/inputs/spdif2/menuSounds\", 2);\ncheckItem(\"/inputs/spdif3/menuSounds\", 2);\ncheckItem(\"/inputs/tv/menuSounds\", 3);\ncheckItem(\"/inputs/usb/menuSounds\", 1);  // this input is not functional yet and a value of one may not be correct\n\n\n// Sound Enhancement\ncheckItem(\"/upmix\", {});\ncheckItem(\"/upmix/select\", \"off\");\ncheckItem(\"/upmix/off/homevis\", true);\ncheckItem(\"/upmix/native/homevis\", true);\ncheckItem(\"/upmix/dolby/homevis\", true);\ncheckItem(\"/upmix/dts/homevis\", true);\ncheckItem(\"/upmix/auro/homevis\", true);\ncheckItem(\"/upmix/mono/homevis\", true);\ncheckItem(\"/upmix/stereo/homevis\", true);\ncheckItem(\"/upmix/dts/ws\", false);\ncheckItem(\"/upmix/dolby/cs\", false);\ncheckItem(\"/upmix/auro/lm\", 0);\ncheckItem(\"/upmix/auro/preset\", 1);\ncheckItem(\"/upmix/auro/strength\", 13);\n\nmsop.set(\"/persistLogs\", fs.existsSync(\"/log2ram.disabled\")?\"on\":\"off\");\ncheckItem(\"/persistLogs\", fs.existsSync(\"/log2ram.disabled\")?\"on\":\"off\");\n\n// volume display option\ncheckItem(\"/volumeDisplay\",\"button\");\n\n// Fast Start\ncheckItem(\"/fastStart\", \"on\");\ncheckItem(\"/fastStartPassThrough\", \"off\");\n\n// power on volume\ncheckItem(\"/powerOnVol\", -50);\n// Volume\nmsop.set(\"/volume\", msop.get(\"/powerOnVol\"));\n// power is on state\ncheckItem(\"/powerIsOn\", true);\n// power action: reset it because we have just powered up\ndeprecated(\"/powerAction\");\ncheckItem(\"/powerAction\", \"none\");\n\n// Night Mode\ncheckItem(\"/night\", \"off\");\n\n// Loudness\ncheckItem(\"/loudness\", \"off\");\ncheckItem(\"/loudnessCurve\", \"iso\");\n\n// DTS dialog enhancement\ncheckItem(\"/dialogEnh\", 0);\n\n// Input\ncheckItem(\"/input\", \"h1\");\n\n// Mute Status\ncheckItem(\"/muted\", false);\n\n// Network Configuration\ncheckItem(\"/network\", {});\n['eth0','wlan0'].forEach(nif=>{\n    checkItem(\"/network/\"+nif, {});\n    checkItem(\"/network/\"+nif+\"/dhcp\", true);\n    checkItem(\"/network/\"+nif+\"/addr\", \"\");\n    checkItem(\"/network/\"+nif+\"/mask\", \"\");\n    checkItem(\"/network/\"+nif+\"/gw\", \"\");\n    checkItem(\"/network/\"+nif+\"/nameservers\", [\"8.8.8.8\", \"8.8.4.4\", \"1.1.1.1\", \"1.0.0.1\"]);\n});\n\n// Read CRDA from /etc/default/crda, REGDOMAIN= line after =\ntry{\n    msop.set(\"/crda\", fs.readFileSync(\"/etc/default/crda\", {encoding:\"utf8\"}).split(\"\\n\").find(a=>a.startsWith(\"REGDOMAIN=\")).substring(10));\n}\ncatch(exc)\n{\n    msop.set(\"/crda\", \"\"); // Empty.\n}\n\n// hw\ncheckItem(\"/hw\", {});\n// Front Panel brightness\ncheckItem(\"/hw/fpBright\", 10);\ndeprecated(\"/versionsAv\");\n\n// Server only last input states\ncheckItem(\"/svronly\", {});\ncheckItem(\"/svronly/lastin\", 'h1');\ncheckItem(\"/svronly/resetmso\", false);\n\n// preset 1/2/3/4\ncheckItem(\"/svronly/preset1\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-50}]);\ncheckItem(\"/svronly/preset2\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-51}]);\ncheckItem(\"/svronly/preset3\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-52}]);\ncheckItem(\"/svronly/preset4\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-53}]);\n// cmd a/b/c/d\ncheckItem(\"/svronly/cmda\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-54}]);\ncheckItem(\"/svronly/cmdb\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-55}]);\ncheckItem(\"/svronly/cmdc\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-56}]);\ncheckItem(\"/svronly/cmdd\", [{\"op\":\"replace\",\"path\":\"/volume\",\"value\":-57}]);\n\n// Create /stat tree\ncheckItem(\"/stat\", {});\n// Create TVSoundSrc with ''\ncheckItem(\"/stat/TVSoundSrc\", '');\n// Create TVSoundSrc with ''\ncheckItem(\"/stat/TVSoundSrcDefault\", 'none');\n// Create earcLinkStatus with ''\ncheckItem(\"/stat/earcLinkStatus\", '');\n// Create CEC Status with ''\ncheckItem(\"/stat/CECStatus\", '');\n// Create systemAudio flag   false means all audio comes from the TV\ndeprecated(\"/stat/systemAudio\");\ncheckItem(\"/stat/systemAudio\", true);\ncheckItem(\"/stat/displayVideoStat\", false);\ncheckItem(\"/stat/displayAudioStat\", false);\ncheckItem(\"/stat/displayAdvancedSettings\", true);\n// Field update messages\ndeprecated(\"/stat/updateprogmsg\");\ncheckItem(\"/stat/updateprogmsg\", {});\ndeprecated(\"/stat/updateprogmsg/updating\");\ncheckItem(\"/stat/updateprogmsg/updating\", false);\n\ncheckItem(\"/modes\", {});\ndeprecated(\"/modes/showinfo\");\ncheckItem(\"/modes/showinfo\", false);\n\n// This must come after all operations\nvar patch = jsonpatch.generate(observer);\nif (patch.length > 0) {\n    if (msg.verb == \"changemso\") {\n        // Filter the patch so as not to conflict with intentional changes.\n        patch = patch.filter(op=>\n           op.path && (!msg.payload.some(\n               plop=>(plop && plop.path && plop.path.startsWith(op.path)) && (plop.op==op.op))\n            )\n        );\n        // Put this patch before the payload of changemso\n        msg.payload = patch.concat(msg.payload); // Concatenate the payload operations after the ones from this operation.\n        // Sort items so any adds come before any other operations; this can result in conflicts\n        msg.payload.sort((x,y)=>{\n            v = item => {\n                switch(item){\n                    case \"add\": return 1;\n                    case \"delete\": return 3;\n                }\n                return 2;\n            }\n            return v(y)-v(x);\n        });\n    }\n    // Generate a changemso in the queue before the next operation\n    else node.send({ payload: patch, verb: \"changemso\" });\n}\nnode.send(msg);\n//console.log(':T:ELAPSE: ' + (new Date() - timestart) + ' ms spent in mso fixup');\n}\ncatch(exc)\n{\n    node.error(exc.stack);\n}\n\nglobal.set('lastIRvol', 0);\nif(msg.verb==\"factoryreset\")\n{\n    node.send([null, {payload: \"forcereload\"}]);\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 350,
+        "y": 520,
+        "wires": [
+            [
+                "dc686cee.66d91"
+            ],
+            [
+                "6373767d.7b80c8"
+            ]
+        ]
+    },
+    {
+        "id": "84981529.dafa48",
+        "type": "udp out",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "addr": "127.0.0.1",
+        "iface": "",
+        "port": "1899",
+        "ipv": "udp4",
+        "outport": "",
+        "base64": false,
+        "multicast": "false",
+        "x": 268,
+        "y": 294,
+        "wires": []
+    },
+    {
+        "id": "ca701747.cec268",
+        "type": "inject",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.1",
+        "x": 130,
+        "y": 500,
+        "wires": [
+            [
+                "b9d7c609.b41358"
+            ]
+        ]
+    },
+    {
+        "id": "3037f17f.7bacfe",
+        "type": "function",
+        "z": "f004e20e.11d2f",
+        "name": "Bluetooth Reply Handler",
+        "func": "event = flow.get('event', 'bluez');\nif(!event.callback) return;\nvar err = null;\nif(msg.payload.error)\n{\n    err = new Error();\n    switch(msg.payload.error)\n    {\n        case \"reject\":\n            err.message = \"Rejected at target device\";\n            err.dbusName = \"org.bluez.Error.Rejected\";\n            break;\n        case \"cancel\":\n            err.message = \"Rejected at target device\";\n            err.dbusName = \"org.bluez.Error.Rejected\";\n            break;\n        default:\n            err.message = msg.payload.error;\n            err.dbusName = msg.payload.error.dbusName;\n    }\n    event.callback(err);\n}\nevent.callback(err, msg.payload.reply);\nflow.set('event', undefined, 'bluez');\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 483,
+        "y": 142,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "afc76218.7bde9",
+        "type": "inject",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "topic": "",
+        "payload": "{\"reply\":\"accept\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 212,
+        "y": 236,
+        "wires": [
+            [
+                "3037f17f.7bacfe"
+            ]
+        ]
+    },
+    {
+        "id": "7eb7d31.2f5782c",
+        "type": "inject",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "topic": "",
+        "payload": "{\"error\":\"reject\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 208,
+        "y": 278,
+        "wires": [
+            [
+                "3037f17f.7bacfe"
+            ]
+        ]
+    },
+    {
+        "id": "a1605812.f6c5f8",
+        "type": "inject",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "topic": "",
+        "payload": "{\"error\":\"cancel\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 214,
+        "y": 326,
+        "wires": [
+            [
+                "3037f17f.7bacfe"
+            ]
+        ]
+    },
+    {
+        "id": "bdb7dc36.bb9d1",
+        "type": "inject",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "topic": "",
+        "payload": "{\"reply\":\"77404\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 220,
+        "y": 187,
+        "wires": [
+            [
+                "3037f17f.7bacfe"
+            ]
+        ]
+    },
+    {
+        "id": "4c9510a1.38a07",
+        "type": "function",
+        "z": "f004e20e.11d2f",
+        "name": "Discoverable Setting",
+        "func": "const bluetooth = global.get('bluetooth');\n// listen on first bluetooth adapter\nbluetooth.getAdapter('hci0').then(adapter=>{\n    adapter.setProperty(\"Discoverable\", true);\n    adapter.setProperty(\"DiscoverableTimeout\", msg.payload);\n});\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 724,
+        "y": 224,
+        "wires": [
+            [
+                "43d2f0fc.7bbbd"
+            ]
+        ]
+    },
+    {
+        "id": "3df2639a.63bcac",
+        "type": "inject",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "topic": "",
+        "payload": "120",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 528,
+        "y": 285,
+        "wires": [
+            [
+                "4c9510a1.38a07"
+            ]
+        ]
+    },
+    {
+        "id": "934cabc4.c473d8",
+        "type": "debug",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 757,
+        "y": 65,
+        "wires": []
+    },
+    {
+        "id": "aad03409.328618",
+        "type": "function",
+        "z": "f004e20e.11d2f",
+        "name": "BlueZ Agent Event Receiver",
+        "func": "jsonpatch = global.get('jsonpatch');\nmso = global.get('mso');\npointer = global.get('pointer');\nconst Bluez = global.get('bluez');\nconst bluetooth = global.get('bluetooth');\n\nmsop = pointer(mso);\n\nnode.status({fill:\"yellow\",shape:\"dot\",text:\"Starting\"});\n\nfunction waiting() { node.status({fill:\"green\",shape:\"dot\",text:\"Waiting\"}) }\n\nclass BluezAgent extends Bluez.Agent {\n    constructor(bluez, DbusObject) {\n        super(bluez, DbusObject);\n    }\n\n    Release(callback) {\n        node.warn(\"Agent Disconnected\");\n        callback();\n    }\n\n    RequestPinCode(device, callback) {\n        bluetooth.getDevice(device).then(async dev=>{\n            var alias = await dev.Alias();\n            var address = await dev.Address();\n            var event = {\"type\": \"requestpincode\", \"device\": device, \"name\": alias, \"address\":address };\n            node.send({\"payload\": \"btevent \" + JSON.stringify(event)});\n            event[\"callback\"] = callback;\n            flow.set('event', event, 'bluez');\n        });\n        // callback(null, this.pin);\n    }\n    \n    DisplayPinCode(device, pincode, callback) {\n        node.warn(\"DisplayPinCode \" + pincode);\n        callback();\n    }\n\n    RequestPasskey(device, callback) {\n        node.warn(\"Send pin\");\n        callback(null, parseInt(this.pin));\n    }\n\n    DisplayPasskey(device, passkey, entered, callback) {\n        node.warn(\"DisplayPasskey \" + passkey);\n        callback();\n    }\n\n    RequestConfirmation(device, passkey, callback) {\n        node.status({fill:\"green\",shape:\"dot\",text:\"Confirmation Request: \" + passkey})\n        node.warn(\"RequestConfirmation\");\n        bluetooth.getDevice(device).then(async dev=>{\n            Promise.all([dev.Alias(), dev.Address()]).then(args=>\n            {\n                var event = {\"type\": \"requestconfirmation\", \"device\": device, \"passkey\": passkey, \"name\": args[0], \"address\":args[1] };\n                node.send({\"payload\": \"btevent \" + JSON.stringify(event)});\n                event[\"callback\"] = callback;\n                flow.set('event', event, 'bluez');\n            },\n            console.log);\n        });\n    }\n\n    RequestAuthorization(device, callback) {\n        node.warn(\"Request authorization\");\n        callback(null);\n    }\n\n    AuthorizeService(device, uuid, callback) {\n        node.warn(\"AuthorizeService \" + uuid);\n        var expectedsvc = \"0000110d-0000-1000-8000-00805f9b34fb\";\n        callback(null, \"\");\n    }\n\n    Cancel(callback) {\n        waiting();\n        node.warn(\"Cancel\");\n        var event = {\"type\": \"cancel\" }\n        node.send({\"payload\": \"btevent \" + JSON.stringify(event)});\n        flow.set('event', undefined, 'bluez');\n        callback();\n    }\n}\n\n// Register callback for new devices\nbluetooth.on('device', (address, props) => {\n    node.warn(\"Found new Device \" + address + \" \" + props.Name);\n});\nbluetooth.init().then(()=>{\n// Initialize bluetooth interface\nbluetooth.registerAgent(\n    new BluezAgent(bluetooth, bluetooth.getUserServiceObject()),\n    \"DisplayYesNo\",\n    true // Register as default agent.\n).then(\n    waiting, // Successful registration\n    reason=>{\n        // Rejection, which might just be pre-existing registration.\n        if(reason.dbusName == \"org.bluez.Error.AlreadyExists\") waiting();\n        else node.status;\n    }\n);\n});\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 443,
+        "y": 65,
+        "wires": [
+            [
+                "934cabc4.c473d8",
+                "118ace58.fda8c2"
+            ]
+        ]
+    },
+    {
+        "id": "5541c4da.654e1c",
+        "type": "inject",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 167,
+        "y": 63,
+        "wires": [
+            [
+                "aad03409.328618"
+            ]
+        ]
+    },
+    {
+        "id": "a08b1840.db93a8",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "btreply",
+        "links": [
+            "46aff1e6.cd1da"
+        ],
+        "x": 663,
+        "y": 375,
+        "wires": []
+    },
+    {
+        "id": "13a9d472.addc3c",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "btdiscover",
+        "links": [
+            "356af7a.cda3808"
+        ],
+        "x": 662,
+        "y": 419,
+        "wires": []
+    },
+    {
+        "id": "356af7a.cda3808",
+        "type": "link in",
+        "z": "f004e20e.11d2f",
+        "name": "btdiscover receiver",
+        "links": [
+            "13a9d472.addc3c"
+        ],
+        "x": 514,
+        "y": 223,
+        "wires": [
+            [
+                "4c9510a1.38a07"
+            ]
+        ]
+    },
+    {
+        "id": "46aff1e6.cd1da",
+        "type": "link in",
+        "z": "f004e20e.11d2f",
+        "name": "btreply receiver",
+        "links": [
+            "a08b1840.db93a8"
+        ],
+        "x": 222,
+        "y": 143,
+        "wires": [
+            [
+                "3037f17f.7bacfe"
+            ]
+        ]
+    },
+    {
+        "id": "118ace58.fda8c2",
+        "type": "websocket out",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 885,
+        "y": 134,
+        "wires": []
+    },
+    {
+        "id": "e3a664ec.5c83e8",
+        "type": "comment",
+        "z": "f004e20e.11d2f",
+        "name": "Bluetooth Segment",
+        "info": "The Bluetooth segment handles matters such as pairing of Bluetooth devices and setting the discoverable mode.",
+        "x": 129,
+        "y": 118,
+        "wires": []
+    },
+    {
+        "id": "5d6b46bc.4d9a78",
+        "type": "comment",
+        "z": "f004e20e.11d2f",
+        "name": "Source Management Segment",
+        "info": "Source Management covers the enabling and disabling of the audio sources in response to selections.\nThis is where we turn on and off the services related to audio output (USB and Bluetooth).\n",
+        "x": 144,
+        "y": 408,
+        "wires": []
+    },
+    {
+        "id": "43d2f0fc.7bbbd",
+        "type": "debug",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 1028,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "644a18af.a00708",
+        "type": "http in",
+        "z": "9d3c7b29.75e418",
+        "name": "register.html",
+        "url": "/register.html",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 100,
+        "wires": [
+            [
+                "395523ab.1db62c"
+            ]
+        ]
+    },
+    {
+        "id": "6bd53940.21ed08",
+        "type": "function",
+        "z": "9d3c7b29.75e418",
+        "name": "Redirect to DV",
+        "func": "msg.payload = msg.payload.replace(/%ENDPOINTID%/, msg.endpointid);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 647.0000076293945,
+        "y": 101,
+        "wires": [
+            [
+                "fa907b47.8c2a38",
+                "4fff6349.7688cc"
+            ]
+        ]
+    },
+    {
+        "id": "fa907b47.8c2a38",
+        "type": "http response",
+        "z": "9d3c7b29.75e418",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 813.0000114440918,
+        "y": 101,
+        "wires": []
+    },
+    {
+        "id": "395523ab.1db62c",
+        "type": "file in",
+        "z": "9d3c7b29.75e418",
+        "name": "endpointId",
+        "filename": "/var/lib/olympia/endpointId.txt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "x": 329.00000381469727,
+        "y": 100.80002403259277,
+        "wires": [
+            [
+                "d8148071.24e29"
+            ]
+        ]
+    },
+    {
+        "id": "c6d6487a.e56238",
+        "type": "debug",
+        "z": "9d3c7b29.75e418",
+        "name": "endpointId.out",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "x": 662.0000076293945,
+        "y": 164,
+        "wires": []
+    },
+    {
+        "id": "b80e555d.0cbaa8",
+        "type": "file in",
+        "z": "9d3c7b29.75e418",
+        "name": "devlink.tmplt",
+        "filename": "/opt/olympia/node-red/static/templates/devlink.tmplt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "x": 438.00000381469727,
+        "y": 164.8000259399414,
+        "wires": [
+            [
+                "6bd53940.21ed08",
+                "c6d6487a.e56238"
+            ]
+        ]
+    },
+    {
+        "id": "d8148071.24e29",
+        "type": "function",
+        "z": "9d3c7b29.75e418",
+        "name": "save endpointid",
+        "func": "msg.endpointid = msg.payload.replace(/[^ _\\-0-9A-Za-z]/g, '');\n\nvar birth;\nbirth = { payload : \"init null\" };\n\nreturn [msg, birth];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 221,
+        "y": 165.00000095367432,
+        "wires": [
+            [
+                "b80e555d.0cbaa8"
+            ],
+            [
+                "f70c8929.e9f9b8"
+            ]
+        ]
+    },
+    {
+        "id": "4fff6349.7688cc",
+        "type": "debug",
+        "z": "9d3c7b29.75e418",
+        "name": "DV.out",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "x": 822.0000114440918,
+        "y": 48.200011253356934,
+        "wires": []
+    },
+    {
+        "id": "f70c8929.e9f9b8",
+        "type": "link out",
+        "z": "9d3c7b29.75e418",
+        "name": "reg.birth",
+        "links": [
+            "73e91207.17839c"
+        ],
+        "x": 425,
+        "y": 224.99999618530273,
+        "wires": []
+    },
+    {
+        "id": "35902053.d9df5",
+        "type": "comment",
+        "z": "9d3c7b29.75e418",
+        "name": "Alexa registration",
+        "info": "",
+        "x": 485.00000762939453,
+        "y": 66.99999904632568,
+        "wires": []
+    },
+    {
+        "id": "b2bbd9c0.625cb8",
+        "type": "function",
+        "z": "9d3c7b29.75e418",
+        "name": "Network Scan",
+        "func": "var nets = global.get('cp').execSync(\"nmcli -m multiline d wifi list\", { encoding: \"utf8\" }).split('*:')\n        .map(i =>\n            i.split(\"\\n\")\n                .slice(1, -1)\n                .reduce((acc, j) => {\n                    acc[j.split(\":\")[0].toLowerCase()] = j.slice(40);\n                    return acc;\n                }, {})\n        )\n        .slice(1)\n        .map(net=>{\n            delete net.bars;\n            if(net.security=='') delete net.security;\n            return net;\n        });\nmsg.payload=\"wifinetworks \" + JSON.stringify(nets);\nnode.send(msg);\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 340,
+        "y": 320,
+        "wires": [
+            [
+                "b379f9d2.de3ee8"
+            ]
+        ]
+    },
+    {
+        "id": "1a5b9703.2465b9",
+        "type": "http in",
+        "z": "9d3c7b29.75e418",
+        "name": "",
+        "url": "/wifipubkey.pem",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 560,
+        "wires": [
+            [
+                "1ad88818.4b90e8"
+            ]
+        ]
+    },
+    {
+        "id": "f5f2e729.b2d448",
+        "type": "http response",
+        "z": "9d3c7b29.75e418",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 575,
+        "y": 565,
+        "wires": []
+    },
+    {
+        "id": "1ad88818.4b90e8",
+        "type": "change",
+        "z": "9d3c7b29.75e418",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "pubkey",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 386,
+        "y": 563,
+        "wires": [
+            [
+                "f5f2e729.b2d448"
+            ]
+        ]
+    },
+    {
+        "id": "88380785.3d0908",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "wifiscan send",
+        "links": [
+            "896d9746.48b1f8"
+        ],
+        "x": 662,
+        "y": 455,
+        "wires": []
+    },
+    {
+        "id": "b379f9d2.de3ee8",
+        "type": "websocket out",
+        "z": "9d3c7b29.75e418",
+        "name": "",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 576,
+        "y": 321,
+        "wires": []
+    },
+    {
+        "id": "896d9746.48b1f8",
+        "type": "link in",
+        "z": "9d3c7b29.75e418",
+        "name": "wifiscan recv",
+        "links": [
+            "88380785.3d0908"
+        ],
+        "x": 186,
+        "y": 325,
+        "wires": [
+            [
+                "b2bbd9c0.625cb8"
+            ]
+        ]
+    },
+    {
+        "id": "e22f725b.72b89",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "netapply send",
+        "links": [
+            "c810ba5.4a4de48"
+        ],
+        "x": 660,
+        "y": 497,
+        "wires": []
+    },
+    {
+        "id": "c810ba5.4a4de48",
+        "type": "link in",
+        "z": "d9723a24.504ca8",
+        "name": "netapply recv",
+        "links": [
+            "e22f725b.72b89"
+        ],
+        "x": 129,
+        "y": 472,
+        "wires": [
+            [
+                "18fdb95b.0d4e77"
+            ]
+        ]
+    },
+    {
+        "id": "18fdb95b.0d4e77",
+        "type": "function",
+        "z": "d9723a24.504ca8",
+        "name": "netapply",
+        "func": "var cp = global.get('cp');\n\n// Check for eth0's connection status (e.g. active connection)\n\n/** Parse a multiline terse output from nmcli to an object\n * \n * @param {*} mlt A string containing the multi-line terse output of nmcli\n */\nfunction mlt2obj(mlt) {\n    return mlt.split('\\n')\n        .reduce((acc, i) => {\n            o = i.split('.')[0];\n            m = i.slice(o.length + 1).split(':')[0];\n            v = i.slice(o.length + m.length + 2);\n            console.log(o, m, v);\n            if (!acc[o]) acc[o] = {};\n            if (!acc[o][m]) acc[o][m] = v;\n            return acc;\n        }, {});\n}\n\n/** Parse a multiline terse output from nmcli to an array of objects with named fields\n * \n * @param {*} mlt The multiline terse output of nmcli\n * @param {*} fields The value passed to --fields of nmcli\n */\nfunction mlt2arr(mlt, fields) {\n    // Turn the format string into an array of fields\n    fields = fields.split(',').map(x => x.trim());\n    // Split the input up\n    return mlt.split('\\n')\n        .filter(x => x !== '')\n        .map(ent => {\n            ent = ent.split(/(?<!\\\\):/).map(x => x.replace(/\\\\./g, x => x[1])); // Unescape\n            out = {};\n            fields.forEach((v, i) => { out[v] = ent[i] })\n            return out;\n        });\n}\n\n// FIXME: Sanitize input variables\nif (msg.payload.conid) {\n    var uuidregex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;\n    if (!uuidregex.test(msg.payload.conid)) {\n        msg.payload = `error \"Invalid UUID for connection ${msg.payload.conid}\"`;\n    }\n}\n\nswitch (msg.payload.action) {\n    case 'delete':\n        {\n            cp.execSync(`nmcli c delete uuid ${msg.payload.conid}`);\n            return;\n        }\n        break;\n    case 'connect':\n        {\n            cp.execSync(`nmcli c up uuid ${msg.payload.conid}`);\n            return;\n        }\n        break;\n    case 'disconnect':\n        {\n            cp.execSync(`nmcli c down uuid ${msg.payload.conid}`);\n            return;\n        }\n        break;\n    case 'conedit':\n        {\n            if(!msg.payload.config) return;\n            if (msg.payload.config.dhcp) {\n                cp.execSync(`nmcli c modify uuid ${msg.payload.config.uuid} ipv4.address \"\" ipv4.gateway \"\" ipv4.method auto`);\n            } else {\n                dnsentries = msg.payload.config.dns.reduce((acc, cur) => `${acc} +ipv4.dns \"${cur}\" `, \"\");\n                ipaddressentries = msg.payload.config.addresses.reduce((acc,cur) => `${acc} +ipv4.addresses \"${cur.address}/${cur.prefixlen}\" `, \"\");\n                cp.execSync(`nmcli c modify uuid ${msg.payload.config.uuid} ipv4.method manual gw4 \"${msg.payload.config.gateway}\" ipv4.dns \"\"${dnsentries} ipv4.addresses \"\" ${ipaddressentries}`);\n            }\n            cp.execSync(`nmcli c up uuid ${msg.payload.config.uuid}`);\n            return;\n        }\n        break;\n    case 'getcondetail':\n        {\n            var detail = mlt2obj(cp.execSync(`nmcli -t -f ipv4,GENERAL.UUID connection show uuid ${msg.payload.conid}`, { encoding: \"utf8\" }));\n            msg.payload = `nmcondetail ${JSON.stringify(detail)}`;\n            return msg;\n        }\n    case 'add':\n        {\n            cp.execSync(`nmcli d wifi connect \\\"${msg.payload.ssid}\\\" password ${msg.payload.password}`);\n            return;\n        }\n        break;\n    case 'radio':\n        {\n            cp.execSync(`nmcli r wifi ${msg.payload.enable ? \"on\" : \"off\"}`)\n            return;\n        }\n        break;\n    case 'getcons':\n        {\n            var cons = cp.execSync(`nmcli -t -f TYPE,UUID,NAME c show`, { encoding: \"utf8\" })\n                .split('\\n')\n                .map(con => {\n                    con = con.split(/(?<!\\\\):/).map(x => x.replace(/\\\\./g, x => x[1])); // Unescape\n                    if (con[0] != \"802-11-wireless\") return null;\n                    return { \"uuid\": con[1], \"name\": con[2] };\n                })\n                .filter(con => (con !== null));\n            msg.payload = `nmcons ${JSON.stringify(cons)}`;\n            return msg;\n        }\n    case 'nmstat':\n        {\n            // Gather the status of the NetworkManager to keep the page up to date.\n            // Supersedes 'getcons', 'wifiscan'\n            consfields = \"TYPE,UUID,NAME,ACTIVE,DEVICE\";\n            var stat = {\n                radioenabled: cp.execSync(`nmcli r wifi`, { encoding: \"utf8\" }) == \"enabled\\n\",\n                cons: mlt2arr(cp.execSync(`nmcli -t -f ${consfields} c show`, { encoding: \"utf8\" }), consfields),\n                wifinets: cp.execSync(\"nmcli -m multiline d wifi list\", { encoding: \"utf8\" }).split('*:')\n                    .map(i =>\n                        i.split(\"\\n\")\n                        .slice(1, -1)\n                        .reduce((acc, j) => {\n                            acc[j.split(\":\")[0].toLowerCase()] = j.slice(40);\n                            return acc;\n                        }, {})\n                    )\n                    .slice(1)\n                    .map(net => {\n                        delete net.bars;\n                        if (net.security == '') delete net.security;\n                        return net;\n                    }),\n                devs: {\n                    \"eth0\": mlt2obj(cp.execSync(`nmcli -t d show eth0`, { encoding: \"utf8\" })),\n                    \"wlan0\": mlt2obj(cp.execSync(`nmcli -t d show wlan0`, { encoding: \"utf8\" }))\n                }\n            }\n            if(stat.devs.eth0.GENERAL[\"CON-PATH\"] != '--') {\n                stat[\"eth0detail\"] = mlt2obj(cp.execSync(`nmcli -t -f ipv4,GENERAL.UUID connection show apath ${stat.devs.eth0.GENERAL[\"CON-PATH\"]}`, { encoding: \"utf8\" }));\n            } else {\n                stat[\"eth0detail\"] = '--';\n            }\n            msg.payload = `nmstat ${JSON.stringify(stat)}`;\n            return msg;\n        }\n    case \"reset\":\n        {\n            // Delete all connections associated with eth0\n            cp.execSync(`nmcli -t -f CONNECTIONS.AVAILABLE-CONNECTIONS d show eth0`, { encoding: \"utf8\" })\n                .split('\\n')\n                .map(con=>con.split(/[:\\s]/)[1])\n                .filter(con=>con)\n                .forEach(con=>cp.execSync(`nmcli c delete uuid ${con}`));\n            // Force up the eth0 connection (Creates connection implicitly)\n            cp.execSync(`nmcli d connect eth0`);\n            // Set the eth0 connection to priority 2 (Elevated), but set timeouts to allow it to fail gracefully if no DHCP.\n            cp.execSync(`nmcli c modify id eth0 ipv4.dhcp-timeout 5 connection.autoconnect-retries 1`);\n            // Create the fallback to link-local conneection (Low priority)\n            cp.execSync(`nmcli c add con-name eth0-linklocal type ethernet connection.autoconnect-priority -1 connection.interface-name eth0 ipv4.method link-local`);\n            return;\n        }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 259,
+        "y": 480,
+        "wires": [
+            [
+                "e348b1e1.f72d9"
+            ]
+        ]
+    },
+    {
+        "id": "2093391f.c959b6",
+        "type": "http in",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "url": "/wt.json",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 184,
+        "y": 630,
+        "wires": [
+            [
+                "38b39e64.a5f4a2"
+            ]
+        ]
+    },
+    {
+        "id": "29cff7fc.acc9d8",
+        "type": "http response",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 481,
+        "y": 635,
+        "wires": []
+    },
+    {
+        "id": "38b39e64.a5f4a2",
+        "type": "function",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "func": "wt = global.get('wt');\nmsg.payload = {};\nwt.iwconfig.status((err,st)=>{\n    msg.payload.iwconfig=st;\n    wt.ifconfig.status((err,st)=>{\n        msg.payload.ifconfig=st;\n        msg.payload=JSON.stringify(msg.payload,null,2);\n        node.send(msg);\n    });\n});",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 349,
+        "y": 649,
+        "wires": [
+            [
+                "29cff7fc.acc9d8"
+            ]
+        ]
+    },
+    {
+        "id": "5c2424ce.df871c",
+        "type": "function",
+        "z": "d9723a24.504ca8",
+        "name": "CP Test",
+        "func": "cp = global.get('cp');\ncp.execSync('touch /tmp/iworked');\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1007,
+        "y": 546,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4c38cf85.872ff",
+        "type": "inject",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 807,
+        "y": 541,
+        "wires": [
+            [
+                "5c2424ce.df871c"
+            ]
+        ]
+    },
+    {
+        "id": "d1d4cae0.225db",
+        "type": "inject",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 330,
+        "y": 40,
+        "wires": [
+            [
+                "c82f6d81.1b09c8"
+            ]
+        ]
+    },
+    {
+        "id": "c82f6d81.1b09c8",
+        "type": "function",
+        "z": "d9723a24.504ca8",
+        "name": "Timestamper for AVCUI",
+        "func": "var now = new Date(Date.now());\n\nvar mo = now.getMonth();\nvar da = now.getDate();\nvar ho = now.getHours();\nvar mi = now.getMinutes();\nvar se = now.getSeconds();\n\nmo = mo + 1;\nmo = ( mo < 10 ? \"0\" : \"\" ) + mo;\nda = ( da < 10 ? \"0\" : \"\" ) + da;\nho = ( ho < 10 ? \"0\" : \"\" ) + ho;\nmi = ( mi < 10 ? \"0\" : \"\" ) + mi;\nse = ( se < 10 ? \"0\" : \"\" ) + se;\n\nmsg.payload = '#' + mo + da + '-' + ho + mi + se;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 510,
+        "y": 100,
+        "wires": [
+            [
+                "d7d031d.d9565d",
+                "90ef182d.2732c8"
+            ]
+        ]
+    },
+    {
+        "id": "d663bc4b.e6c7b",
+        "type": "debug",
+        "z": "d9723a24.504ca8",
+        "name": "msoupdate brcst",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 1170,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c257666d.c71008",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "ircmd convertor",
+        "func": "//console.log(':T:ELAPSE: ' + (new Date() - global.get('newverb')) + ' ms enter ircmd');\n\nvar mso = global.get('mso');\nvar sysconf = global.get('sysconf');\n\nvar changes = [];\nvar selected, newstate;\n\nconst nightrotate = {\n    off : 'auto',\n    auto : 'on',\n    on : 'off'\n};\n\n// defeat logic to prevent double acting of changemso from avController\n// because avController does not take action for IR remote.\nmsg.fromController = false;\n\n\nmsg.payload.forEach(el => {\n    if (el.src == 'ir') {\n        newstate = undefined;\n\n        // handler for: user inputs\n        if ((el.code >= sysconf.ir.REMOTE_CMD_INPUT_1) && \n            (el.code <= sysconf.ir.REMOTE_CMD_INPUT_9)) {\n            selected = Object.entries(mso.inputs).filter(x=>x[1].visible)[(el.code - sysconf.ir.REMOTE_CMD_INPUT_1)];\n            if (selected !== undefined) {\n                selected = Object.entries(mso.inputs).filter(x=>x[1].visible)[(el.code - sysconf.ir.REMOTE_CMD_INPUT_1)][0];\n                newstate = { op :\"replace\", path :\"/input\", value :selected};\n            }\n        } \n        // handler for: last input\n        else if (el.code == sysconf.ir.REMOTE_CMD_LAST_INPUT) {\n            //node.warn('LAST: ' + mso.svronly.lastin);\n            newstate = { op :\"replace\", path : \"/input\", value : mso.svronly.lastin};\n        } \n        // handler for: fp brightness\n        else if (el.code == sysconf.ir.REMOTE_CMD_DIM) {\n            selected = (mso.hw.fpBright == 10) ? 0 : (mso.hw.fpBright + 1);\n            newstate = { op :\"replace\", path :\"/hw/fpBright\", value :selected};\n        } \n        // handler for: input '+' keys\n        else if ((el.code == sysconf.ir.REMOTE_CMD_NEXT_HDMI) || \n                 (el.code == sysconf.ir.REMOTE_CMD_NEXT_SPDIF) || \n                 (el.code == sysconf.ir.REMOTE_CMD_NEXT_STREAMING) || \n                 (el.code == sysconf.ir.REMOTE_CMD_NEXT_ANALOG)) {\n            // mso.input is the current input\n            // sysconf.ircode[el.code].value is the selected input group\n            if (sysconf.irInputGrp.grps[sysconf.ircode[el.code].value].grp !=\n                sysconf.irInputGrp.grps[mso.input].grp) {\n                // last input is not in this rotate group, goes to the first\n                selected = sysconf.irInputGrp.grps[sysconf.ircode[el.code].value].first;\n            } else {\n                // last input is in this rotate group, goes to the next\n                selected = sysconf.irInputGrp.grps[mso.input].next;\n            }\n            newstate = { op :\"replace\", path :\"/input\", value :selected};\n        }\n        // handler for: volume\n        else if ((el.code == sysconf.ir.REMOTE_CMD_VOLUME_UP) || \n                 (el.code == sysconf.ir.REMOTE_CMD_VOLUME_DOWN)) {\n            var now = new Date();\n            var lastIRvol = global.get('lastIRvol');\n            // throw out rapidly fired volume changes from IR within 300 msec of last change\n            if((now - lastIRvol) > 300)  {\n                global.set('lastIRvol', now);\n\n                if (mso.muted) {\n                    newstate = { op :\"replace\", path :\"/muted\", value :false};\n                  //console.log('ircmd='+JSON.stringify(el)+' --> '+JSON.stringify(newstate));\n                    changes.push (newstate);\n                }\n                selected = mso.volume + ((el.code == sysconf.ir.REMOTE_CMD_VOLUME_UP) ? +1 : -1);\n// is this right to limit range?\nif (selected > mso.cal.vph) {\n    selected = mso.cal.vph;\n}\nif (selected < mso.cal.vpl) {\n    selected = mso.cal.vpl;\n}\n                newstate = { op :\"replace\", path :\"/volume\", value :selected};\n            }\n\n        }\n        // handler for: mute\n        else if (el.code == sysconf.ir.REMOTE_CMD_MUTE_TOGGLE) {\n            newstate = { op :\"replace\", path : \"/muted\", value : (!mso.muted)};\n        }\n        else if (el.code == sysconf.ir.REMOTE_CMD_INFO) {\n            newstate = { op :\"replace\", path : \"/modes/showinfo\", value : (!mso.modes.showinfo)};\n        } \n        // handler for: dialog enhancement\n        else if ((el.code == sysconf.ir.REMOTE_CMD_DIALOG_VOL_UP) ||\n                 (el.code == sysconf.ir.REMOTE_CMD_DIALOG_VOL_DOWN)) {\n            selected = mso.dialogEnh + \n                    ((el.code == sysconf.ir.REMOTE_CMD_DIALOG_VOL_UP) ? +1 : -1);\n            if (selected > 6) {\n                selected = 6;\n            }\n            if (selected < 0) {\n                selected = 0;\n            }\n            newstate = { op :\"replace\", path :\"/dialogEnh\", value :selected};\n        } \n        // handler for: Dirac\n        else if (el.code == sysconf.ir.REMOTE_CMD_DIRAC_ON) {\n            newstate = { op :\"replace\", path : \"/cal/diracactive\", value : \"on\"};\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_DIRAC_OFF) {\n            newstate = { op :\"replace\", path : \"/cal/diracactive\", value : \"off\"};\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_DIRAC_TOGGLE) {\n            if (mso.cal.diracactive == 'off') {\n                newstate = { op :\"replace\", path : \"/cal/diracactive\", value : \"on\"};\n            } else if (mso.cal.diracactive == 'on') {\n                newstate = { op :\"replace\", path : \"/cal/diracactive\", value : \"bypass\"};\n            } else {\n                newstate = { op :\"replace\", path : \"/cal/diracactive\", value : \"off\"};\n            }\n        } \n        // handler for: night mode\n        else if (el.code == sysconf.ir.REMOTE_CMD_NIGHT_MODE_TOGGLE) {\n            selected = nightrotate[mso.night];\n            newstate = { op :\"replace\", path : \"/night\", value : selected};\n        } \n        // handler for: loudness\n        else if (el.code == sysconf.ir.REMOTE_CMD_LOUDNESS_ON) {\n            newstate = { op :\"replace\", path : \"/loudness\", value : \"on\"};\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_LOUDNESS_OFF) {\n            newstate = { op :\"replace\", path : \"/loudness\", value : \"off\"};\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_LOUDNESS_TOGGLE) {\n            // mso.loudness ought to be true/false\n            newstate = { op :\"replace\", path : \"/loudness\", value : ((mso.loudness == \"on\") ? \"off\" : \"on\")};\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_PRESET_1) {\n            // mso.loudness ought to be true/false\n            mso.svronly.preset1.forEach( el => { changes.push (el); } );\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_PRESET_2) {\n            // mso.loudness ought to be true/false\n            mso.svronly.preset2.forEach( el => { changes.push (el); } );\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_PRESET_3) {\n            // mso.loudness ought to be true/false\n            mso.svronly.preset3.forEach( el => { changes.push (el); } );\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_PRESET_4) {\n            // mso.loudness ought to be true/false\n            mso.svronly.preset4.forEach( el => { changes.push (el); } );\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_A) {\n            // mso.loudness ought to be true/false\n            mso.svronly.cmda.forEach( el => { changes.push (el); } );\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_B) {\n            // mso.loudness ought to be true/false\n            mso.svronly.cmdb.forEach( el => { changes.push (el); } );\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_C) {\n            // mso.loudness ought to be true/false\n            mso.svronly.cmdc.forEach( el => { changes.push (el); } );\n        } \n        else if (el.code == sysconf.ir.REMOTE_CMD_D) {\n            // mso.loudness ought to be true/false\n            mso.svronly.cmdd.forEach( el => { changes.push (el); } );\n        } \n        // handler for: direct action buttons\n        else {\n            if (sysconf.ircode[el.code] !== undefined) {\n                // catch all only if defined\nif (el.code == sysconf.ir.REMOTE_CMD_BLUE) {\n// Per Brian, #451; send directly to avcui mq_console\n    node.send([null,{payload: \"hpe\" }]);\n} else {\n                    newstate = { op :\"replace\", path : sysconf.ircode[el.code].node, value : sysconf.ircode[el.code].value };\n                }\n            } else {\n                node.warn('IR error: ' + el.code + ' sysconf.ir.REMOTE_CMD_PRESET_3:' + sysconf.ir.REMOTE_CMD_PRESET_3);\n                node.error('No handler for IR code: ' + sysconf.ir.code);\n            }\n        }\n        if (newstate !== undefined) {\n            console.log('ircmd='+JSON.stringify(el)+' --> '+JSON.stringify(newstate));\n            changes.push (newstate);\n        }\n   }\n});\n\n//console.log(':T:ELAPSE: ' + (new Date() - global.get('newverb')) + ' ms exit ircmd');\n\nif (changes.length > 0) {\n    msg.payload = changes;\n    return msg;\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 700,
+        "y": 320,
+        "wires": [
+            [
+                "79b96e9e.9db06"
+            ],
+            [
+                "46957ecf.19aac"
+            ]
+        ]
+    },
+    {
+        "id": "dc686cee.66d91",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "GetVersionNumbers",
+        "func": "mso = global.get('mso');\nfs = global.get('fs');\ngetFile = file=>{\n    var content;\n    try{\n        content = fs.readFileSync(file, 'utf8');\n    }\n    catch(exc)\n    {\n        content = `Error: File ${file} not found`;\n    }\n    return content;\n}\nmso.versions = \n{\n    \"apm100\":getFile('/var/lib/olympia/APM_version.txt'),\n    \"avController\":getFile('/var/lib/olympia/avControl_version.txt'),\n    \"backplane\":getFile('/var/lib/olympia/backplane_version.txt'),\n    \"hardware\":getFile('/var/lib/olympia/olympia_hw_ver.txt'),\n    \"hdmiVer\":getFile('/var/lib/olympia/hdmi_fw_ver.txt'),\n    \"SerialNumber\":getFile('/var/lib/olympia/olympia_sn.txt'),\n    \"GuiNodeRed\":getFile('/var/lib/olympia/githead.txt'),\n    \"rootfsVer\":getFile('/var/lib/olympia/rootfs_ver.txt'),\n    \"swVer\":getFile('/var/lib/olympia/swver.txt')\n};\n//node.warn(\"get version numbers\")\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 440,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c9a384d7.a75c48",
+        "type": "inject",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "x": 110,
+        "y": 720,
+        "wires": [
+            [
+                "aaf9671a.cc5758",
+                "cb9748fe.023118"
+            ]
+        ]
+    },
+    {
+        "id": "aaf9671a.cc5758",
+        "type": "exec",
+        "z": "f3732c66.fe9f9",
+        "command": "ip monitor address",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "",
+        "x": 370,
+        "y": 700,
+        "wires": [
+            [
+                "499b2b10.690674",
+                "cb9748fe.023118"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "499b2b10.690674",
+        "type": "debug",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 630,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "cb9748fe.023118",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "IP Address Information",
+        "func": "var mso = global.get('mso');\nvar cp = global.get('cp'); // require('child-process');\njsonpatch = global.get('jsonpatch');\n\n// Deep copy the MSO\nvar cpmso = JSON.parse(JSON.stringify(mso));\n\n// Process the output of ip command to an object.\nvar ipaddrs = cp.execSync('ip -o addr show',{encoding:\"utf8\"} ).split(\"\\n\").filter(a=>(a!==\"\"));\ncpmso.ipInfo = ipaddrs.reduce((acc, cur)=>{\n    cur=cur.split(\"\\\\\")[0].split(\" \").filter(a=>(a!==\"\"));\n    if(acc[cur[1]] === undefined) acc[cur[1]] = [];\n    addrInfo = {\n        family:cur[2],\n        address:cur[3].split(\"/\")[0],\n        prefixlen:cur[3].split(\"/\")[1],\n        label:cur[8]\n    };\n    acc[cur[1]].push(addrInfo);\n    return acc;\n},{});\n\n// Legacy support for MSO changes\nif(cpmso.ipInfo[\"eth0\"])\n{\n    cpmso.hostip = cpmso.ipInfo[\"eth0\"][0].address;\n}\nelse \n    cpmso.hostip = \"Ethernet Not Connected\";\n\n// Generate patch\nmsg.verb = \"changemso\";\nmsg.payload = jsonpatch.compare(mso, cpmso);\nif(msg.payload.length==0) return; // No change.\n// Mark as not from web client\nmsg.fromController = true;\nmsg._session = \"no-one\";\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 780,
+        "wires": [
+            [
+                "d6daa338.466c7"
+            ]
+        ]
+    },
+    {
+        "id": "d6daa338.466c7",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "changemso",
+        "links": [
+            "59432cca.445764"
+        ],
+        "x": 755,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "5f4b2a09.3c98c4",
+        "type": "debug",
+        "z": "ee65b866.781048",
+        "name": "dbg update message",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 740,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "747b7b85.b58fa4",
+        "type": "debug",
+        "z": "ee65b866.781048",
+        "name": "dbg activate update",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 650,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "1a025149.2763cf",
+        "type": "exec",
+        "z": "ee65b866.781048",
+        "command": "/opt/olympia/update_main.sh",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "update_main.sh",
+        "x": 640,
+        "y": 200,
+        "wires": [
+            [
+                "cbd85537.71da58"
+            ],
+            [
+                "cbd85537.71da58"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "97c6bb44.9386f8",
+        "type": "http in",
+        "z": "ee65b866.781048",
+        "name": "/update.html",
+        "url": "/update.html",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 120,
+        "wires": [
+            [
+                "a3dd9831.18d708",
+                "96920b0d.4daab8",
+                "cbd85537.71da58"
+            ]
+        ]
+    },
+    {
+        "id": "9f586ce2.3ed4",
+        "type": "http response",
+        "z": "ee65b866.781048",
+        "name": "redirector",
+        "statusCode": "200",
+        "headers": {},
+        "x": 620,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "a3dd9831.18d708",
+        "type": "file in",
+        "z": "ee65b866.781048",
+        "name": "update.html",
+        "filename": "/opt/olympia/node-red/static/update.html",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "x": 410,
+        "y": 120,
+        "wires": [
+            [
+                "9f586ce2.3ed4",
+                "747b7b85.b58fa4"
+            ]
+        ]
+    },
+    {
+        "id": "c80a2336.a32f4",
+        "type": "link in",
+        "z": "f3732c66.fe9f9",
+        "name": "updateprog",
+        "links": [
+            "6459406e.357d9"
+        ],
+        "x": 955,
+        "y": 700,
+        "wires": [
+            [
+                "ed40dd96.92c07"
+            ]
+        ]
+    },
+    {
+        "id": "5963f81f.40b678",
+        "type": "tcp in",
+        "z": "ee65b866.781048",
+        "name": "1799",
+        "server": "server",
+        "host": "",
+        "port": "1799",
+        "datamode": "single",
+        "datatype": "utf8",
+        "newline": "",
+        "topic": "",
+        "base64": false,
+        "x": 460,
+        "y": 440,
+        "wires": [
+            [
+                "5f4b2a09.3c98c4",
+                "eceb5be.306cda8"
+            ]
+        ]
+    },
+    {
+        "id": "96920b0d.4daab8",
+        "type": "function",
+        "z": "ee65b866.781048",
+        "name": "parse parameters",
+        "func": "var param;\nparam = '';\n\nif (msg.payload.host !== undefined) {\n    param = param + msg.payload.host + ' ';\n}\n\nif (msg.payload.commitish !== undefined) {\n    param = param + msg.payload.commitish + ' ';\n}\n\nmsg.payload = param;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 440,
+        "y": 200,
+        "wires": [
+            [
+                "1a025149.2763cf",
+                "cbd85537.71da58"
+            ]
+        ]
+    },
+    {
+        "id": "cb319e17.9ea41",
+        "type": "http in",
+        "z": "ee65b866.781048",
+        "name": "/history.html",
+        "url": "/history.html",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "8667739f.1a032"
+            ]
+        ]
+    },
+    {
+        "id": "4688a142.3e87f",
+        "type": "http response",
+        "z": "ee65b866.781048",
+        "name": "redirector",
+        "statusCode": "200",
+        "headers": {},
+        "x": 780,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "6017a9db.fd88d8",
+        "type": "file in",
+        "z": "ee65b866.781048",
+        "name": "gitrevert.html",
+        "filename": "/tmp/gitrevert.html",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "x": 550,
+        "y": 280,
+        "wires": [
+            [
+                "4688a142.3e87f"
+            ]
+        ]
+    },
+    {
+        "id": "8667739f.1a032",
+        "type": "exec",
+        "z": "ee65b866.781048",
+        "command": "/opt/olympia/gitrevertform.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "gitrevertform.sh",
+        "x": 360,
+        "y": 280,
+        "wires": [
+            [
+                "6017a9db.fd88d8",
+                "7cea8cc0.b1cc94"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "3dd2fed1.4a7cc2",
+        "type": "inject",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "30",
+        "x": 130,
+        "y": 600,
+        "wires": [
+            [
+                "dc686cee.66d91"
+            ]
+        ]
+    },
+    {
+        "id": "eceb5be.306cda8",
+        "type": "link out",
+        "z": "ee65b866.781048",
+        "name": "updateprogmsg",
+        "links": [
+            "38756aee.57d836"
+        ],
+        "x": 795,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "38756aee.57d836",
+        "type": "link in",
+        "z": "f3732c66.fe9f9",
+        "name": "updateverb",
+        "links": [
+            "94e71cef.781c7",
+            "eceb5be.306cda8"
+        ],
+        "x": 295,
+        "y": 140,
+        "wires": [
+            [
+                "5d5aa7d7.955738"
+            ]
+        ]
+    },
+    {
+        "id": "cbd85537.71da58",
+        "type": "debug",
+        "z": "ee65b866.781048",
+        "name": "update_main",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 830,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "6e75531c.40c7e4",
+        "type": "http in",
+        "z": "ee65b866.781048",
+        "name": "/olylogfiles",
+        "url": "/olylogfiles",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 560,
+        "wires": [
+            [
+                "c2b0df78.080b7"
+            ]
+        ]
+    },
+    {
+        "id": "f23df76f.883678",
+        "type": "function",
+        "z": "ee65b866.781048",
+        "name": "http header",
+        "func": "msg.headers = {\n    \"Connection\" : \"close\",\n    \"Content-Disposition\" : \"inline; filename=\\\"olylogfiles.tgz.gpg\\\"\",\n    \"Content-Type\" : \"application/x-zip\"\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 530,
+        "y": 640,
+        "wires": [
+            [
+                "c080d0f2.62b628"
+            ]
+        ]
+    },
+    {
+        "id": "c080d0f2.62b628",
+        "type": "http response",
+        "z": "ee65b866.781048",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 690,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "af5d1748.ad0d5",
+        "type": "file in",
+        "z": "ee65b866.781048",
+        "name": "",
+        "filename": "/tmp/olylogfiles.tgz.gpg",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "x": 320,
+        "y": 640,
+        "wires": [
+            [
+                "f23df76f.883678"
+            ]
+        ]
+    },
+    {
+        "id": "c2b0df78.080b7",
+        "type": "exec",
+        "z": "ee65b866.781048",
+        "command": "/opt/olympia/olylogfiles.sh",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "olylogfiles.sh",
+        "x": 290,
+        "y": 560,
+        "wires": [
+            [
+                "af5d1748.ad0d5"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "24288125.b6627e",
+        "type": "http in",
+        "z": "ee65b866.781048",
+        "name": "/release_notes",
+        "url": "/release_notes",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 780,
+        "wires": [
+            [
+                "ab25cc18.02a2a"
+            ]
+        ]
+    },
+    {
+        "id": "cffa7491.4e8948",
+        "type": "http response",
+        "z": "ee65b866.781048",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 740,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "b61f1ceb.f0ff2",
+        "type": "file in",
+        "z": "ee65b866.781048",
+        "name": " Release_Notes_latest.txt",
+        "filename": "/opt/olympia/node-red/static/relnotes/Release_Notes_latest.txt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": true,
+        "x": 660,
+        "y": 780,
+        "wires": [
+            [
+                "a8a16f43.5702a"
+            ]
+        ]
+    },
+    {
+        "id": "a8a16f43.5702a",
+        "type": "markdown",
+        "z": "ee65b866.781048",
+        "name": "",
+        "x": 580,
+        "y": 860,
+        "wires": [
+            [
+                "cffa7491.4e8948"
+            ]
+        ]
+    },
+    {
+        "id": "ab25cc18.02a2a",
+        "type": "exec",
+        "z": "ee65b866.781048",
+        "command": "/opt/olympia/gitrevertform.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "gitrevertform.sh",
+        "x": 390,
+        "y": 780,
+        "wires": [
+            [
+                "b61f1ceb.f0ff2",
+                "7cea8cc0.b1cc94"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b5a93cf0.63eb7",
+        "type": "inject",
+        "z": "ee65b866.781048",
+        "name": "Check update",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "21600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "180",
+        "x": 170,
+        "y": 960,
+        "wires": [
+            [
+                "ec0c9d3.3f7da6"
+            ]
+        ]
+    },
+    {
+        "id": "ec0c9d3.3f7da6",
+        "type": "exec",
+        "z": "ee65b866.781048",
+        "command": "/opt/olympia/gitrevertform.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "gitrevertform.sh",
+        "x": 350,
+        "y": 960,
+        "wires": [
+            [
+                "7cea8cc0.b1cc94"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "7cea8cc0.b1cc94",
+        "type": "function",
+        "z": "ee65b866.781048",
+        "name": "newupdate mso",
+        "func": "mso = global.get('mso');\nfs = global.get('fs');\ngetFile = file=>{\n    var content;\n    try{\n        content = fs.readFileSync(file, 'utf8');\n    }\n    catch(exc)\n    {\n        content = `Error: File ${file} not found`;\n    }\n    return content;\n}\nvar newupdate = getFile('/var/lib/olympia/newupdate.txt');\nvar gitbranch = getFile('/var/lib/olympia/gitbranch.txt');\nvar devrespavail = getFile('/var/lib/olympia/dev_resp.txt');\nif (devrespavail == \"Error: File /var/lib/olympia/dev_resp.txt not found\") {\n    devrespavail = false;\n} else {\n    devrespavail = true;\n}\nnode.warn(devrespavail);\n\nmsg.payload = \"[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/stat/newupdate\\\", \\\"value\\\":\\\"\"+newupdate+\"\\\"},\"+\n               \"{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/stat/gitbranch\\\", \\\"value\\\":\\\"\"+gitbranch+\"\\\"},\"+\n               \"{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/stat/devrespavail\\\", \\\"value\\\":\"+devrespavail+\"}]\";\n\n// save finding\nmso = global.get('mso');\nmso.stat.newupdate = newupdate;\nmso.stat.gitbranch = gitbranch;\nmso.stat.devrespavail = devrespavail;\nglobal.set('mso', mso);\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 690,
+        "y": 960,
+        "wires": [
+            [
+                "3d98aae1.4607b6"
+            ]
+        ]
+    },
+    {
+        "id": "83043a7.22074c8",
+        "type": "link in",
+        "z": "d9723a24.504ca8",
+        "name": "brcstmsg",
+        "links": [
+            "3d98aae1.4607b6"
+        ],
+        "x": 715,
+        "y": 100,
+        "wires": [
+            [
+                "648de005.48a08"
+            ]
+        ]
+    },
+    {
+        "id": "3d98aae1.4607b6",
+        "type": "link out",
+        "z": "ee65b866.781048",
+        "name": "",
+        "links": [
+            "83043a7.22074c8"
+        ],
+        "x": 825,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "84e2b183.ad332",
+        "type": "debug",
+        "z": "1386606c.9db65",
+        "name": "webapi",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 480,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "b2e663a7.9ef4f8",
+        "type": "function",
+        "z": "1386606c.9db65",
+        "name": "webapi",
+        "func": "var res = \"{ \\\"current time\\\" : \\\"\" + new Date() + \"\\\" }\";\n\nif (msg.payload.cmd !== undefined) {\n    var cmds = JSON.parse(msg.payload.cmd);\n    res = \"{ \\\"current time\\\" : \\\"\" + new Date()       + \"\\\",\\n\" +\n            \"\\\"received cmd\\\" :: \\\"\" + msg.payload.cmd + \"\\\" }\";\n    // validate proper JSON patch object\n    cmds.forEach((cmd)=>{\n        if ((cmd !== undefined) &&\n            (cmd.op !== undefined) &&\n            ((cmd.op === 'replace') || (cmd.op === 'add') || (cmd.op === 'avcui')) &&\n            (cmd.path !== undefined) &&\n            (cmd.value !== undefined)) {\n            // validate /volume change parameter\n            if (((cmd.path === '/volume') ||\n                 (cmd.path === '/dialogEnh') || \n                 (cmd.path === '/cal/lipsync') || \n                 (cmd.path === '/cal/ampsense') || \n                 (cmd.path === '/bmmmode')) &&\n                (cmd.value.constructor==Number) &&\n                ((cmd.value <= 22) &&(cmd.value >= -120))) {\n                node.send([null,{payload:\"changemso [\"+JSON.stringify(cmd)+\"]\"}]);\n                res = \"{ \\\"current time\\\" : \\\"\" + new Date()      + \"\\\",\\n\" +\n                        \"\\\"received cmd\\\" : \\\" + cmd.path + \\\",\\n\" + \n                        \"\\\"accepted\\\" : \\\"\" + JSON.stringify(cmd) + \"\\\" }\";\n            } else if (((cmd.path === '/input') ||\n                 (cmd.path === '/upmix/select') || \n                 (cmd.path === '/night') || \n                 (cmd.path === '/loudness') || \n                 (cmd.path === '/speakers/groups/lr/size') || \n                 (cmd.path === '/speakers/groups/c/size') || \n                 (cmd.path === '/speakers/groups/lrs/size') || \n                 (cmd.path === '/speakers/groups/lrb/size') || \n                 (cmd.path === '/speakers/groups/lrw/size') || \n                 (cmd.path === '/speakers/groups/lrtf/size') || \n                 (cmd.path === '/speakers/groups/lrtr/size') || \n                 (cmd.path === '/speakers/groups/lrtm/size')) &&\n                (cmd.value.constructor==String)) {\n                node.send([null,{payload:\"changemso [\"+JSON.stringify(cmd)+\"]\"}]);\n                res = \"{ \\\"current time\\\" : \\\"\" + new Date()      + \"\\\",\\n\" +\n                        \"\\\"received cmd\\\" : \\\" + cmd.path + \\\",\\n\" + \n                        \"\\\"accepted\\\" : \\\"\" + JSON.stringify(cmd) + \"\\\" }\";\n            } else if (((cmd.path === '/muted') || \n                 (cmd.path === '/powerIsOn') ||\n                 (cmd.path === '/cal/diracactive') || \n                 (cmd.path === '/eq/tc') || \n                 (cmd.path === '/peq/peqsw') || \n                 (cmd.path === '/speakers/groups/c/present') || \n                 (cmd.path === '/speakers/groups/sub1/present') || \n                 (cmd.path === '/speakers/groups/sub2/present') || \n                 (cmd.path === '/speakers/groups/sub3/present') || \n                 (cmd.path === '/speakers/groups/lrs/present') || \n                 (cmd.path === '/speakers/groups/lrb/present') || \n                 (cmd.path === '/speakers/groups/lrw/present') || \n                 (cmd.path === '/speakers/groups/lrtf/present') || \n                 (cmd.path === '/speakers/groups/lrtr/present') || \n                 (cmd.path === '/speakers/groups/lrtm/present') || \n                 (cmd.path === '/speakers/groups/lrhr/present') || \n                 (cmd.path === '/speakers/groups/lrhf/present')) &&\n                (cmd.value.constructor==Boolean)) {\n                node.send([null,{payload:\"changemso [\"+JSON.stringify(cmd)+\"]\"}]);\n                res = \"{ \\\"current time\\\" : \\\"\" + new Date()      + \"\\\",\\n\" +\n                        \"\\\"received cmd\\\" : \\\" + cmd.path + \\\",\\n\" + \n                        \"\\\"accepted\\\" : \\\"\" + JSON.stringify(cmd) + \"\\\" }\";\n            } else if ((cmd.path === 'productiontestaccess') && (cmd.value.constructor==String) &&\n                (cmd.op === 'avcui')) {\n                node.send([null,{payload:`avcui \\\"`+cmd.value+`\\\"`}]);\n                res.results = \"accepted\";\n            } else {\n                node.send([null,{payload:\"changemso [\"+JSON.stringify(cmd)+\"]\"}]);\n                res = \"{ \\\"current time\\\" : \\\"\" + new Date()      + \"\\\",\\n\" +\n                        \"\\\"received cmd\\\" : \\\" + cmd.path + \\\",\\n\" + \n                        \"\\\"accepted\\\" : \\\"\" + JSON.stringify(cmd) + \"\\\" }\";\n            }\n\n        }\n    });\n}\n\nmsg.payload = res;\n\nmsg.headers = {\"Content-Type\" : \"application/json\"};\n\nreturn msg;\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 280,
+        "y": 120,
+        "wires": [
+            [
+                "84e2b183.ad332",
+                "883c196b.7b8ea"
+            ],
+            [
+                "94e71cef.781c7",
+                "84e2b183.ad332"
+            ]
+        ]
+    },
+    {
+        "id": "883c196b.7b8ea",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 770,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "94e71cef.781c7",
+        "type": "link out",
+        "z": "1386606c.9db65",
+        "name": "webapi",
+        "links": [
+            "38756aee.57d836"
+        ],
+        "x": 435,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "cf67483a.ada5d8",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/webapi POST",
+        "url": "/webapi",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "b2e663a7.9ef4f8",
+                "84e2b183.ad332"
+            ]
+        ]
+    },
+    {
+        "id": "86496c11.40ec78",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/config.json",
+        "url": "/config.json",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 240,
+        "wires": [
+            [
+                "1e2ffa9b.5cbb9d"
+            ]
+        ]
+    },
+    {
+        "id": "12b04e95.5680f9",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 530,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "1e2ffa9b.5cbb9d",
+        "type": "function",
+        "z": "1386606c.9db65",
+        "name": "export mso",
+        "func": "var mso = global.get('mso');\nmsg.payload = JSON.stringify(mso, null, 3);\n\nmsg.headers = {\"Content-Type\" : \"application/json\"};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 330,
+        "y": 240,
+        "wires": [
+            [
+                "12b04e95.5680f9"
+            ]
+        ]
+    },
+    {
+        "id": "2d3aa04f.4ac23",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/import",
+        "url": "/import",
+        "method": "post",
+        "upload": true,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 340,
+        "wires": [
+            [
+                "e7b97799.575418",
+                "a8e0f784.62dad"
+            ]
+        ]
+    },
+    {
+        "id": "be08e137.a6bcf",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 540,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "e7b97799.575418",
+        "type": "function",
+        "z": "1386606c.9db65",
+        "name": "inport mso",
+        "func": "try {\n    var newmso = JSON.parse(msg.req.files[0].buffer);\n\n    global.set('mso', newmso);\n\n    node.warn('newmso: ' + JSON.stringify(newmso,null,2));\n\n    //msg.payload = \"Imported \" + msg.req.files[0].buffer.lenght + \" bytes\";\n\n    msg.payload = `\n<html>\n<body>\nSuccessfully imported configuration.<p>\nReturn to <a href=\"/\">Home Page</a>\n</body>\n<html>\n`;\n\n}\n\ncatch(exc)\n{\n    node.error(exc.stack);\n    msg.payload = `\n<html>\n<body>\nFailed to import configuration.<p>\nReturn to <a href=\"/\">Home Page</a>\n<html>\n`;\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 320,
+        "y": 340,
+        "wires": [
+            [
+                "be08e137.a6bcf",
+                "a8e0f784.62dad",
+                "fbcc56ff.2e2568"
+            ]
+        ]
+    },
+    {
+        "id": "a8e0f784.62dad",
+        "type": "debug",
+        "z": "1386606c.9db65",
+        "name": "import payload",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 520,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "d09cc35f.d3615",
+        "type": "link in",
+        "z": "f3732c66.fe9f9",
+        "name": "run mso fixup",
+        "links": [
+            "fbcc56ff.2e2568"
+        ],
+        "x": 175,
+        "y": 540,
+        "wires": [
+            [
+                "b9d7c609.b41358"
+            ]
+        ]
+    },
+    {
+        "id": "fbcc56ff.2e2568",
+        "type": "link out",
+        "z": "1386606c.9db65",
+        "name": "",
+        "links": [
+            "d09cc35f.d3615"
+        ],
+        "x": 495,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "e348b1e1.f72d9",
+        "type": "websocket out",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 510,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "a60c8105.099d7",
+        "type": "link out",
+        "z": "f3732c66.fe9f9",
+        "name": "applydebug out",
+        "links": [
+            "d7c927ef.2856f8"
+        ],
+        "x": 655,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "d7c927ef.2856f8",
+        "type": "link in",
+        "z": "9d3c7b29.75e418",
+        "name": "applydebug in",
+        "links": [
+            "a60c8105.099d7"
+        ],
+        "x": 189,
+        "y": 403,
+        "wires": [
+            [
+                "c41ffd9d.99fc5"
+            ]
+        ]
+    },
+    {
+        "id": "c41ffd9d.99fc5",
+        "type": "change",
+        "z": "9d3c7b29.75e418",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "\"diag mask \" & payload",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 329,
+        "y": 403,
+        "wires": [
+            [
+                "3525dd53.f87b22",
+                "c2bfcb32.223108"
+            ]
+        ]
+    },
+    {
+        "id": "3525dd53.f87b22",
+        "type": "posixmq-write",
+        "z": "9d3c7b29.75e418",
+        "msgname": "/mq__console",
+        "msgsize": "1024",
+        "maxmsgs": "60",
+        "create": false,
+        "ofprotect": false,
+        "x": 529,
+        "y": 383,
+        "wires": []
+    },
+    {
+        "id": "c2bfcb32.223108",
+        "type": "debug",
+        "z": "9d3c7b29.75e418",
+        "name": "applydebug payload",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 549,
+        "y": 443,
+        "wires": []
+    },
+    {
+        "id": "6a7ea70e.6c15b8",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "Factory Reset",
+        "func": "mso = global.get('mso');\nmso = {};\nglobal.set('mso', mso);\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 250,
+        "y": 460,
+        "wires": [
+            [
+                "b9d7c609.b41358"
+            ]
+        ]
+    },
+    {
+        "id": "6123f4ea.4df8ac",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/hidden",
+        "url": "/hidden",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 480,
+        "wires": [
+            [
+                "e1a7838e.b4429"
+            ]
+        ]
+    },
+    {
+        "id": "47ce910b.2fc22",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 730,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "e1a7838e.b4429",
+        "type": "function",
+        "z": "1386606c.9db65",
+        "name": "hidden repo",
+        "func": "var param;\nparam = '';\n\nif (msg.payload.host !== undefined) {\n    param = param + msg.payload.host;\n}\n\nmsg.payload = param;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 290,
+        "y": 480,
+        "wires": [
+            [
+                "383cc542.0f021a",
+                "37aab45f.3de22c"
+            ]
+        ]
+    },
+    {
+        "id": "383cc542.0f021a",
+        "type": "exec",
+        "z": "1386606c.9db65",
+        "command": "/opt/olympia/fetch_hidden.sh",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "fetch_hidden.sh",
+        "x": 520,
+        "y": 480,
+        "wires": [
+            [
+                "47ce910b.2fc22",
+                "37aab45f.3de22c"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "37aab45f.3de22c",
+        "type": "debug",
+        "z": "1386606c.9db65",
+        "name": "hidden",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 710,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "6373767d.7b80c8",
+        "type": "websocket out",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "server": "ae17ef01.d8dec",
+        "client": "",
+        "x": 770,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "2aa8b97b.105b16",
+        "type": "inject",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "topic": "",
+        "payload": "forcereload",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 520,
+        "y": 660,
+        "wires": [
+            [
+                "6373767d.7b80c8"
+            ]
+        ]
+    },
+    {
+        "id": "3398003d.f1f6d",
+        "type": "inject",
+        "z": "d9723a24.504ca8",
+        "name": "",
+        "topic": "reset",
+        "payload": "{\"action\": \"reset\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 160,
+        "y": 540,
+        "wires": [
+            [
+                "18fdb95b.0d4e77"
+            ]
+        ]
+    },
+    {
+        "id": "91d68883.a7c178",
+        "type": "catch",
+        "z": "1386606c.9db65",
+        "name": "bad webapi",
+        "scope": [
+            "b2e663a7.9ef4f8"
+        ],
+        "x": 550,
+        "y": 140,
+        "wires": [
+            [
+                "883c196b.7b8ea"
+            ]
+        ]
+    },
+    {
+        "id": "42598290.1e2bac",
+        "type": "http in",
+        "z": "a5324352.454fb",
+        "name": "",
+        "url": "/feedback",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "4c983430.f1d5cc"
+            ]
+        ]
+    },
+    {
+        "id": "4a5bca19.472934",
+        "type": "template",
+        "z": "a5324352.454fb",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<h1>Please give us your feedback:</h1>\n\n<p>Return to the <a href=\"\\\">Home page</a></p>\n\nYour feedback is very important to us. It is the most direct way we can learn about \nhow the system is actually performing in the field. It also informs us about \nthe direction for future work and improvement. \n<p>\n\nWhile we very much appreciate your feedback, due to the volume of the feedback \nwe may get and our focus of getting new features out as fast as we could, we cannot \npromise an individual response to your specific input. However, you can rest assured \nthat your input is recorded and carefully reviewed for future improvement.\n<p>\n\n<strong>If you need technical support, you should contact our technical support department directly \nfor the fastest response using one of following methods:</strong>\n<p>\n\n<pre>\nweb/chat: <a href=\"https://www.monoprice.com/help?pn=contact\">https://www.monoprice.com/help?pn=contact</a>\nemail: <a href=\"mailto://tech@monoprice.com\">tech@monoprice.com</a>\nphone: 877.271.2592 Monday - Friday: 6:00AM - 5:00PM PST \n</pre>\n\n<font style=\"color:black;background-color:yellow\"><strong>Technical support will not be provided through the feedback form.</strong></font>\n\n\n\n<form action=\"/feedback\" method=\"POST\">\n    {{{dev_resp}}}\n    \n    <p><input type=\"submit\" name=\"submit\" value=\"Submit\" accesskey=\"s\">\n        <input type=\"submit\" name=\"reload\" value=\"Reload\" accesskey=\"r\"></p>\n\n    <p>Your feedback:<p>\n        <textarea name=\"feedback\" cols=50 rows=7 accesskey=\"e\"></textarea></p>\n    <p>Please describe the make and model of all the equipment \n        connected to your HTP-1 input and output connectors:<p>\n        <textarea name=\"sysconfig\" cols=50 rows=7>{{{sysconfig}}}</textarea></p>\n    <p><input type=\"submit\" name=\"clear\" value=\"Erase\" accesskey=\"e\"> all feedback history (this action cannot be undone.)</p>\n</form>\n\n\n<p>\nHistory:\n</p>\n<pre>\n{{{feedback_history}}}    \n</pre>\n",
+        "output": "str",
+        "x": 590,
+        "y": 100,
+        "wires": [
+            [
+                "72399d48.6dec04"
+            ]
+        ]
+    },
+    {
+        "id": "72399d48.6dec04",
+        "type": "http response",
+        "z": "a5324352.454fb",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 780,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "4c983430.f1d5cc",
+        "type": "function",
+        "z": "a5324352.454fb",
+        "name": "read feedback",
+        "func": "fs = global.get('fs');\ngetFile = file=> {\n    var content;\n    try{\n        content = fs.readFileSync(file, 'utf8');\n    }\n    catch(exc)\n    {\n        content = '';\n    }\n    return content;\n}\n\nmsg.feedback_history = getFile('/var/lib/olympia/feedback_history.txt');\n\nmsg.sysconfig = getFile('/var/lib/olympia/sysconfig.txt');\n\nmsg.dev_resp = getFile('/var/lib/olympia/dev_resp.txt');\nif (msg.dev_resp !== '') {\n    msg.dev_resp = '<pre>' + msg.dev_resp + '</pre>' +\n        \"<p><input type=\\\"submit\\\" name=\\\"clearresp\\\" value=\\\"Clear\\\"> developers' response.</p>\"\n        ;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 410,
+        "y": 100,
+        "wires": [
+            [
+                "4a5bca19.472934",
+                "31d3788.4a58c88"
+            ]
+        ]
+    },
+    {
+        "id": "5e544196.e30ae",
+        "type": "http in",
+        "z": "a5324352.454fb",
+        "name": "",
+        "url": "/feedback",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 220,
+        "wires": [
+            [
+                "ec583bc3.d4a9b8",
+                "31d3788.4a58c88"
+            ]
+        ]
+    },
+    {
+        "id": "ec583bc3.d4a9b8",
+        "type": "function",
+        "z": "a5324352.454fb",
+        "name": "write feedback",
+        "func": "var feedback = null;\n\nfs = global.get('fs');\ngetFile = file=> {\n    var content;\n    try{\n        content = fs.readFileSync(file, 'utf8');\n    }\n    catch(exc)\n    {\n        content = '';\n    }\n    return content;\n}\n\n//msg.feedback_history = getFile('/var/lib/olympia/feedback_history.txt');\nif ((msg.payload.submit !== undefined) &&\n    (msg.payload.submit === 'Submit') &&\n    (msg.payload.sysconfig !== undefined) &&\n    (msg.payload.feedback !== undefined) &&\n    (msg.payload.feedback.search(/[^\\s]/) >= 0)) {\n    // submit feedback\n    try{\n        history = getFile('/var/lib/olympia/feedback_history.txt');\n        history = \"Your feedback submitted on \"+new Date()+\":\\n\\n\"+msg.payload.feedback+\"\\n\\nsysconfig:\\n\"+msg.payload.sysconfig+\"\\n\\n\"+history;\n        fs.writeFileSync('/var/lib/olympia/feedback_history.txt', history);\n\n        feedback = {};\n        feedback.payload = JSON.stringify({\"cmd\" : \"feedback\", \"feedback\" : msg.payload.feedback + \"\\r\\n\\r\\nsysconfig:\\r\\n\" + msg.payload.sysconfig});\n    }\n    catch(exc)\n    {\n    }\n}\n\nif ((msg.payload.clear !== undefined) &&\n    (msg.payload.clear === 'Erase')) {\n    // clear feedback history\n    try{\n        fs.unlinkSync('/var/lib/olympia/feedback_history.txt');\n    }\n    catch(exc)\n    {\n    }\n}\n\n//msg.sysconfig = getFile('/var/lib/olympia/sysconfig.txt');\nif ((msg.payload.submit !== undefined) &&\n    (msg.payload.submit === 'Submit') &&\n    (msg.payload.sysconfig !== undefined) &&\n    (msg.payload.sysconfig.search(/[^\\s]/) >= 0)) {\n    // save sysconfig\n    try{\n        fs.writeFileSync('/var/lib/olympia/sysconfig.txt', msg.payload.sysconfig);\n    }\n    catch(exc)\n    {\n    }\n}\n\nif ((msg.payload.clearresp !== undefined) &&\n    (msg.payload.clearresp === 'Clear')) {\n    // clear developer response\n    try{\n        fs.unlinkSync('/var/lib/olympia/dev_resp.txt');\n    }\n    catch(exc)\n    {\n    }\n}\n\nreturn [msg, feedback];\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 410,
+        "y": 220,
+        "wires": [
+            [
+                "4c983430.f1d5cc"
+            ],
+            [
+                "df426744.03f8f8",
+                "31d3788.4a58c88"
+            ]
+        ]
+    },
+    {
+        "id": "31d3788.4a58c88",
+        "type": "debug",
+        "z": "a5324352.454fb",
+        "name": "feedback",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "x": 570,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "df426744.03f8f8",
+        "type": "udp out",
+        "z": "a5324352.454fb",
+        "name": "",
+        "addr": "127.0.0.1",
+        "iface": "",
+        "port": "1899",
+        "ipv": "udp4",
+        "outport": "",
+        "base64": false,
+        "multicast": "false",
+        "x": 650,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "40690528.77a13c",
+        "type": "http in",
+        "z": "ee65b866.781048",
+        "name": "/privacy",
+        "url": "/privacy",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 1060,
+        "wires": [
+            [
+                "8395c2d7.48f8a"
+            ]
+        ]
+    },
+    {
+        "id": "a89af492.a72f08",
+        "type": "http response",
+        "z": "ee65b866.781048",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 660,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "8395c2d7.48f8a",
+        "type": "file in",
+        "z": "ee65b866.781048",
+        "name": "privacy",
+        "filename": "/opt/olympia/node-red/static/relnotes/privacy_disclosure.txt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": true,
+        "x": 290,
+        "y": 1060,
+        "wires": [
+            [
+                "915ec175.12666"
+            ]
+        ]
+    },
+    {
+        "id": "915ec175.12666",
+        "type": "markdown",
+        "z": "ee65b866.781048",
+        "name": "",
+        "x": 480,
+        "y": 1060,
+        "wires": [
+            [
+                "a89af492.a72f08"
+            ]
+        ]
+    },
+    {
+        "id": "a3fe35bb.920fa8",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/webapi GET",
+        "url": "/webapi",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 180,
+        "wires": [
+            [
+                "c171ea27.ad2368",
+                "3b34b240.64975e"
+            ]
+        ]
+    },
+    {
+        "id": "c171ea27.ad2368",
+        "type": "template",
+        "z": "1386606c.9db65",
+        "name": "webapi API",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Production Automation WEBAPI\n============================\n\nThis is not a supported interface and the following information is solely intended for internal production use.\nThe manufacturer bears no responsibility whatsoever if any access is made through this interface.\n\n* Changing input:\n\n<pre>\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/input\\\",\\\"value\\\":\\\"spdif1\\\"}]\" http://{{req.headers.host}}/webapi\n</pre>\n\n* Changing audio modes:\n\n<pre>\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/upmix/select\\\",\\\"value\\\":\\\"mono\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/night\\\",\\\"value\\\":\\\"off\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/cal/diracactive\\\",\\\"value\\\":false}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/loudness\\\",\\\"value\\\":\\\"off\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/dialogEnh\\\",\\\"value\\\":0}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/cal/lipsync\\\",\\\"value\\\":0}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/eq/tc\\\",\\\"value\\\":false}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/peq/peqsw\\\",\\\"value\\\":false}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/bmmmode\\\",\\\"value\\\":11}]\" http://{{req.headers.host}}/webapi\n</pre>\n\n* Changing volume:\n\n<pre>\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/cal/ampsense\\\",\\\"value\\\":1.6}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/volume\\\",\\\"value\\\":-3}]\" http://{{req.headers.host}}/webapi\n</pre>\n\n* Changing speaker sizes:\n\n<pre>\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lr/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/c/present\\\",\\\"value\\\":true},{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/c/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/sub1/present\\\",\\\"value\\\":true}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/sub2/present\\\",\\\"value\\\":false}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/sub3/present\\\",\\\"value\\\":false}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrs/present\\\",\\\"value\\\":true},{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrs/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrb/present\\\",\\\"value\\\":true},{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrb/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrw/present\\\",\\\"value\\\":true},{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrw/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrtf/present\\\",\\\"value\\\":true},{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrtf/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrtr/present\\\",\\\"value\\\":true},{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrtr/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrtm/present\\\",\\\"value\\\":true},{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrtm/size\\\",\\\"value\\\":\\\"l\\\"}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrhr/present\\\",\\\"value\\\":false}]\" http://{{req.headers.host}}/webapi\n    wget -q -O - --post-data=\"cmd=[{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/speakers/groups/lrhf/present\\\",\\\"value\\\":false}]\" http://{{req.headers.host}}/webapi\n</pre>\n",
+        "output": "str",
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "63e467db.c818e8"
+            ]
+        ]
+    },
+    {
+        "id": "63e467db.c818e8",
+        "type": "markdown",
+        "z": "1386606c.9db65",
+        "name": "",
+        "x": 550,
+        "y": 180,
+        "wires": [
+            [
+                "883c196b.7b8ea"
+            ]
+        ]
+    },
+    {
+        "id": "3b34b240.64975e",
+        "type": "debug",
+        "z": "1386606c.9db65",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 660,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "b33bed78.72c9e",
+        "type": "http in",
+        "z": "f3732c66.fe9f9",
+        "name": "ircmd",
+        "url": "/ircmd",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 790,
+        "y": 440,
+        "wires": [
+            [
+                "d70908.c1a33ef8"
+            ]
+        ]
+    },
+    {
+        "id": "6f8e4722.fda618",
+        "type": "http response",
+        "z": "f3732c66.fe9f9",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1010,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "d70908.c1a33ef8",
+        "type": "function",
+        "z": "f3732c66.fe9f9",
+        "name": "ircmd gateway",
+        "func": "var mso = global.get('mso');\nvar ircmd = null;\n\nif (msg.payload.code !== undefined) {\n    var sysconf = global.get('sysconf');\n    var codes = msg.payload.code.split(',');\n    var ircodes = [];\n    codes.forEach(nec => {\n        // got a code\n        if (sysconf.irNecCode2Enum[nec] !== undefined) {\n            // we recognize the code\n            ircodes.push ({ src : \"ir\", code : sysconf.irNecCode2Enum[nec] });\n        }\n    });\n    if (ircodes.length > 0) {\n        ircmd = {};\n        ircmd.payload = ircodes;\n    }\n}\n\n\n// send status to HTTP client\nmsg.payload = {\n  \"volume\": mso.volume,\n  \"status\": mso.status,\n  \"cal\": {\n    \"lipsync\": mso.cal.lipsync,\n    \"vpl\": mso.cal.vpl,\n    \"vph\": mso.cal.vph,\n    \"ampsense\": mso.cal.ampsense,\n    \"diracactive\": mso.cal.diracactive,\n    \"currentdiracslot\": mso.cal.currentdiracslot,\n    \"caltoolconnected\": mso.cal.caltoolconnected\n  },\n  \"unitname\": mso.unitname,\n  \"bassenhance\": mso.bassenhance,\n  \"eq\": {\n    \"tc\": mso.eq.tc,\n    \"treble\": mso.eq.treble,\n    \"bass\": mso.eq.bass\n  },\n  \"upmix\": mso.upmix.select,\n  \"fastStart\": mso.fastStart,\n  \"fastStartPassThrough\": mso.fastStartPassThrough,\n  \"night\": mso.night,\n  \"loudness\": mso.loudness,\n  \"dialogEnh\": mso.dialogEnh,\n  \"input\": mso.input,\n  \"muted\": mso.muted,\n  \"hw\": mso.hw,\n  \"stat\": mso.stat,\n  \"versions\": mso.versions,\n  \"videostat\": mso.videostat,\n  \"peq\": {\n    \"currentpeqslot\": mso.peq.currentpeqslot,\n    \"peqsw\": mso.peq.peqsw\n  }\n};\n\nreturn [msg, ircmd];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 820,
+        "y": 380,
+        "wires": [
+            [
+                "6f8e4722.fda618"
+            ],
+            [
+                "c257666d.c71008"
+            ]
+        ]
+    },
+    {
+        "id": "4fa02a97.2df004",
+        "type": "http in",
+        "z": "9d3c7b29.75e418",
+        "name": "spkmap",
+        "url": "/spkmap",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 640,
+        "wires": [
+            [
+                "8c746821.337158"
+            ]
+        ]
+    },
+    {
+        "id": "d38bfe77.125eb",
+        "type": "http response",
+        "z": "9d3c7b29.75e418",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 600,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "8c746821.337158",
+        "type": "function",
+        "z": "9d3c7b29.75e418",
+        "name": "spkmap",
+        "func": "var mso = global.get('mso');\n\nmsg.payload = `<!DOCTYPE html PUBLIC \"-//WAPFORUM//DTD XHTML Mobile 1.0//EN\" \"http://www.wapforum.org/DTD/xhtml-mobile10.dtd\">\n<html>\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=EmulateIE7\" />\n<title>HTP-1 Speaker Map</title></head>\n<body>\n<img width=\"1200\" height=\"366\" src=\"/img/HTP-1_back.jpg\">\n<font color=\"LawnGreen\">`;\n\nif((mso!==undefined)&&\n   (mso.speakers!==undefined)&&\n   (mso.speakers.mapping!==undefined)) {\n    let xpos = 63;\n    let xinc = (1015 - 63) / 15;\n    var name;\n\n    for (ii = 0; ii < 16; ii++) {\n        name = mso.speakers.mapping[ii];\n\n        name = name.replace(/Left front/, '&nbsp;&nbsp;L');\n        name = name.replace(/Right front/, '&nbsp;&nbsp;R');\n        name = name.replace(/Center/, '&nbsp;&nbsp;C');\n        name = name.replace(/Subwoofer/, 'Sub');\n        name = name.replace(/Left Surround/, 'LS');\n        name = name.replace(/Right Surround/, 'RS');\n        name = name.replace(/Left Back/, 'LB');\n        name = name.replace(/Right Back/, 'RB');\n        name = name.replace(/Left Top Front/, 'LTF');\n        name = name.replace(/Right Top Front/, 'RTF');\n        name = name.replace(/Left Top Middle/, 'LTM');\n        name = name.replace(/Right Top Middle/, 'RTM');\n        name = name.replace(/Left Top Rear/, 'LTR');\n        name = name.replace(/Right Top Rear/, 'RTR');\n        name = name.replace(/Left High Front/, 'LFH');\n        name = name.replace(/Right High Front/, 'RFH');\n        name = name.replace(/Left High Rear/, 'LRH');\n        name = name.replace(/Right High Rear/, 'RRH');\n        name = name.replace(/Left Wide/, 'LW');\n        name = name.replace(/Right Wide/, 'RW');\n\n        msg.payload = msg.payload + \n        `<div style=\"position: absolute; left:${xpos}px; top:288px;\">${name}</div>`;\n        xpos = xpos + xinc;\n    }\n}\n\nmsg.payload = msg.payload + \n`</font>\n</body>\n</html>`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 350,
+        "y": 640,
+        "wires": [
+            [
+                "d38bfe77.125eb"
+            ]
+        ]
+    },
+    {
+        "id": "f8b327e1.f0d418",
+        "type": "file in",
+        "z": "ee65b866.781048",
+        "name": " Release_Notes.txt",
+        "filename": "/opt/olympia/node-red/static/relnotes/Release_Notes.txt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": true,
+        "x": 380,
+        "y": 860,
+        "wires": [
+            [
+                "a8a16f43.5702a"
+            ]
+        ]
+    },
+    {
+        "id": "18e0fa14.b808a6",
+        "type": "http in",
+        "z": "ee65b866.781048",
+        "name": "/current_release_notes",
+        "url": "/current_release_notes",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 860,
+        "wires": [
+            [
+                "f8b327e1.f0d418"
+            ]
+        ]
+    },
+    {
+        "id": "89b79836.dec098",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/savedirac",
+        "url": "/savedirac",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 600,
+        "wires": [
+            [
+                "db0cae8d.13308"
+            ]
+        ]
+    },
+    {
+        "id": "b257de8d.cd72f",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 850,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "db0cae8d.13308",
+        "type": "exec",
+        "z": "1386606c.9db65",
+        "command": "/opt/olympia/apm/save_dirac_6slots_to_var.sh",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "save_dirac_6slots_to_var.sh",
+        "x": 380,
+        "y": 600,
+        "wires": [
+            [
+                "cceb6471.ca3678",
+                "1771a70.dfeed59"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "cceb6471.ca3678",
+        "type": "debug",
+        "z": "1386606c.9db65",
+        "name": "savedirac",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 700,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "1771a70.dfeed59",
+        "type": "template",
+        "z": "1386606c.9db65",
+        "name": "Save Dirac Filters",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<h1>Dirac Filter Slot Backup</h1>\n\nAll Dirac filters has been prepared for download. \nReturn to <a href=\"/dirac.html\">/dirac.html</a> to download.\n",
+        "output": "str",
+        "x": 670,
+        "y": 600,
+        "wires": [
+            [
+                "b257de8d.cd72f"
+            ]
+        ]
+    },
+    {
+        "id": "36c2b3d4.62db7c",
+        "type": "watch",
+        "z": "f004e20e.11d2f",
+        "name": "USB Watcher",
+        "files": "/sys/class/udc/musb-hdrc.1.auto/device/mode",
+        "recursive": false,
+        "x": 110,
+        "y": 480,
+        "wires": [
+            [
+                "f3558a02.0fce58"
+            ]
+        ]
+    },
+    {
+        "id": "f3558a02.0fce58",
+        "type": "file in",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "filename": "/sys/class/udc/musb-hdrc.1.auto/device/mode",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "x": 390,
+        "y": 480,
+        "wires": [
+            [
+                "d80f62f1.26d85"
+            ]
+        ]
+    },
+    {
+        "id": "7b80efab.c005c",
+        "type": "debug",
+        "z": "f004e20e.11d2f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 930,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "d80f62f1.26d85",
+        "type": "function",
+        "z": "f004e20e.11d2f",
+        "name": "USB Audio Control",
+        "func": "jsonpatch = global.get('jsonpatch');\ncp = global.get('cp');\nmso = global.get('mso');\n\nif(mso.input==\"usb\")\n{\n    switch(msg.payload) {\n        case \"b_idle\\n\":\n            cp.execSync(`systemctl stop usbaudio`);\n            break;\n        case \"b_peripheral\\n\":\n            cp.execSync(`systemctl start usbaudio`);\n            break;\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 730,
+        "y": 480,
+        "wires": [
+            [
+                "7b80efab.c005c"
+            ]
+        ]
+    },
+    {
+        "id": "c11aba39.6a5108",
+        "type": "function",
+        "z": "1386606c.9db65",
+        "name": "inport dirac",
+        "func": "var cp = global.get('cp'); // require('child-process');\nvar fs = global.get('fs');\n\ntry {\n    var diracslot = msg.req.files[0].buffer;\n    var filename = msg.req.files[0].originalname;\n\n    node.warn('diracslot: ' + diracslot.length);\n    \n    if ((diracslot.length == 327680) && (msg.payload.slot.search(/^slot[1-6]$/) >= 0)) {\n        // using only file size as proxy for filter validity.  It is checksum in DSP\n        fs.writeFileSync('/dev/shm/' + filename, diracslot);\n        node.warn('/opt/olympia/apm/dirac_write_slot.sh '+msg.payload.slot.substr(4, 1)+' /dev/shm/'+filename);\n        var rst = cp.execSync('/opt/olympia/apm/dirac_write_slot.sh '+(msg.payload.slot.substr(4, 1)-1)+' /dev/shm/'+filename, {encoding:\"utf8\"} );\n        // zero trim/delay.  This is sent immediately after flashing complete, but avController \n        // has just been launched and APM is booting.  But it seems to work so the queue held the command?\n        node.send([null,{payload: \"clearDelTrim \"+(msg.payload.slot.substr(4, 1)-1) }]);\n        node.warn(rst);\n\n\n        \n    msg.payload = `\n<html>\n<body>\nSuccessfully imported Dirac slot.<p>\nReturn to <a href=\"/dirac.html\">dirac.html</a>\n</body>\n<html>\n`;\n    } else {\n        // unexpected size, assume invalid filter\n        msg.payload = `\n<html>\n<body>\nThe uploaded file appears to be an invalid Dirac filter slot data.<p>\nReturn to <a href=\"/dirac.html\">dirac.html</a>\n</body>\n<html>\n`;\n    \n    }\n\n    //msg.payload = \"Imported \" + msg.req.files[0].buffer.lenght + \" bytes\";\n\n\n}\n\ncatch(exc)\n{\n    node.error(exc.stack);\n    msg.payload = `\n<html>\n<body>\nFailed to import Dirac slot.<p>\nReturn to <a href=\"/dirac.html\">dirac.html</a>\n<html>\n`;\n}\n\n\nreturn msg;\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 370,
+        "y": 760,
+        "wires": [
+            [
+                "7a59ce2b.5b4c4"
+            ],
+            [
+                "a6df1fe8.cc7de"
+            ]
+        ]
+    },
+    {
+        "id": "7a59ce2b.5b4c4",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 560,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "5e0760b8.8502",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/diracimport",
+        "url": "/diracimport",
+        "method": "post",
+        "upload": true,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 760,
+        "wires": [
+            [
+                "c11aba39.6a5108",
+                "ae22cd1c.8c387"
+            ]
+        ]
+    },
+    {
+        "id": "ae22cd1c.8c387",
+        "type": "debug",
+        "z": "1386606c.9db65",
+        "name": "dirac",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 340,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "7f9e6b96.1376f4",
+        "type": "link in",
+        "z": "d9723a24.504ca8",
+        "name": "direct avcui",
+        "links": [
+            "a6df1fe8.cc7de"
+        ],
+        "x": 655,
+        "y": 360,
+        "wires": [
+            [
+                "90ef182d.2732c8",
+                "d7d031d.d9565d"
+            ]
+        ]
+    },
+    {
+        "id": "a6df1fe8.cc7de",
+        "type": "link out",
+        "z": "1386606c.9db65",
+        "name": "direct avcui",
+        "links": [
+            "7f9e6b96.1376f4"
+        ],
+        "x": 555,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "9b742bda.f2c0e8",
+        "type": "http in",
+        "z": "ee65b866.781048",
+        "name": "/release_notes_sha1",
+        "url": "/release_notes_sha1",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 700,
+        "wires": [
+            [
+                "80ed3b19.ccd298"
+            ]
+        ]
+    },
+    {
+        "id": "491bdb0d.7cee24",
+        "type": "file in",
+        "z": "ee65b866.781048",
+        "name": "/dev/shm/relnotessha1.md",
+        "filename": "/dev/shm/relnotessha1.md",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": true,
+        "x": 900,
+        "y": 700,
+        "wires": [
+            [
+                "a8a16f43.5702a"
+            ]
+        ]
+    },
+    {
+        "id": "276181ea.f4ceae",
+        "type": "exec",
+        "z": "ee65b866.781048",
+        "command": "/opt/olympia/relnotessha1.sh",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "relnotessha1.sh",
+        "x": 620,
+        "y": 700,
+        "wires": [
+            [
+                "491bdb0d.7cee24"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "80ed3b19.ccd298",
+        "type": "function",
+        "z": "ee65b866.781048",
+        "name": "sha1=",
+        "func": "var param;\nparam = '';\n\nif (msg.payload.sha1 !== undefined) {\n    param = param + msg.payload.sha1;\n}\n\nmsg.payload = param;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 400,
+        "y": 700,
+        "wires": [
+            [
+                "276181ea.f4ceae"
+            ]
+        ]
+    },
+    {
+        "id": "88a46487.e86a28",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/powerlog",
+        "url": "/powerlog",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 920,
+        "wires": [
+            [
+                "b85f77ba.2ca818"
+            ]
+        ]
+    },
+    {
+        "id": "b85f77ba.2ca818",
+        "type": "file in",
+        "z": "1386606c.9db65",
+        "name": "power.log",
+        "filename": "/var/log/olympia/power.log",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "x": 280,
+        "y": 920,
+        "wires": [
+            [
+                "d7f83511.b22988"
+            ]
+        ]
+    },
+    {
+        "id": "d7f83511.b22988",
+        "type": "function",
+        "z": "1386606c.9db65",
+        "name": "format power.log",
+        "func": "msg.payload = msg.payload.replace(/\\n/gm, \"\\n    \");\n\nmsg.payload = \"System power event log\\n==============\\n\\nReturn to [Home](/)\\n\\n    \" + msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 440,
+        "y": 920,
+        "wires": [
+            [
+                "71456823.3bf968"
+            ]
+        ]
+    },
+    {
+        "id": "71456823.3bf968",
+        "type": "markdown",
+        "z": "1386606c.9db65",
+        "name": "md power.log",
+        "x": 620,
+        "y": 920,
+        "wires": [
+            [
+                "e7016dcf.b0615"
+            ]
+        ]
+    },
+    {
+        "id": "e7016dcf.b0615",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 770,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "704def3d.7267a8",
+        "type": "http in",
+        "z": "1386606c.9db65",
+        "name": "/mode",
+        "url": "/mode",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 1000,
+        "wires": [
+            [
+                "67e6dc7f.2ac384"
+            ]
+        ]
+    },
+    {
+        "id": "7d765560.bb9244",
+        "type": "http response",
+        "z": "1386606c.9db65",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 660,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "875e5ad0.4270f8",
+        "type": "template",
+        "z": "1386606c.9db65",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "The mode has been set to: {{payload}}",
+        "output": "str",
+        "x": 480,
+        "y": 1000,
+        "wires": [
+            [
+                "7d765560.bb9244"
+            ]
+        ]
+    },
+    {
+        "id": "67e6dc7f.2ac384",
+        "type": "function",
+        "z": "1386606c.9db65",
+        "name": "mocd parser",
+        "func": "var param;\nparam = '';\n\nif (msg.payload.mode !== undefined) {\n    param = msg.payload.mode;\n}\n\nmsg.payload = param;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 310,
+        "y": 1000,
+        "wires": [
+            [
+                "875e5ad0.4270f8",
+                "ca37e93f.d9884"
+            ]
+        ]
+    },
+    {
+        "id": "ca37e93f.d9884",
+        "type": "file",
+        "z": "1386606c.9db65",
+        "name": "sum.mode",
+        "filename": "/var/lib/olympia/sum.mode",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "x": 490,
+        "y": 1040,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "effc2f94.d2705",
+        "type": "exec",
+        "z": "f3732c66.fe9f9",
+        "command": "/opt/olympia/update_fw_253.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "update_fw_253",
+        "x": 430,
+        "y": 920,
+        "wires": [
+            [
+                "9c994213.3ffd9"
+            ],
+            [
+                "9c994213.3ffd9"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "9c994213.3ffd9",
+        "type": "debug",
+        "z": "f3732c66.fe9f9",
+        "name": "update_fw_253",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 640,
+        "y": 880,
+        "wires": []
+    }
+]

@@ -25,6 +25,10 @@ it on your HTP-1 at some point.
 JSoosiah's lovely UI is available at http://your-htp1-ip-address/custom
 
 
+If you put a config.json file that you've exported from the HTP-1's
+settings page in the root of this drive, it will automatically be
+imported on the first start.
+
 *** EXPERTS ONLY ***
 If you put an authorized_keys file in the root of this drive, you
 will be able to SSH into your HTP-1 as root using your private key.

@@ -1,23 +1,18 @@
 ### Scripts
 
-These are the scrips that modify the HTP-1. Two types of scripts are allowed, plus
-arbitrary files that may also be needed. Scripts are run in lexicographic order.
-Outside and inside scripts are run in the same overall ordering scheme - so an
-outside script might copy a file into the root fs, followed by an inside script
-that relies on it, as long as the correct naming is used.
+These are the scripts that modify the HTP-1. Two sets of scripts are run: first,
+rootfs scripts, which modify the root filesystem the HTP-1 runs on. Scripts are
+run in lexicographic order. The rootfs scripts are run from a chroot such that
+the root of the HTP-1 filesystem appars to be /. This means that a command such
+as `systemctl disable` would disable a service inside the HTP-1. The htp1-mods
+folder is mountedat /htp1-mods.
 
-#### Inside scripts
-
-These scripts are run from a chroot inside of the HTP-1's file system. This means
-that a `systemctl disable` command would disable a service inside the HTP-1. The
-entire htp1-mods folder will be accessible at /htp1-mods
-
-#### Outside scripts
-
-These scripts are run from outside the HTP-1's file system. To protect the
-development machine, and ensure mistakes are not made, these scripts are still
-run inside a docker container. The entire htp1-mods folder will be accessible at
-/htp1-mods and the HTP-1's root filesystem will be accessible at /htp1-root
+After resulting root filesystem is exported to an SD-card image, it is further
+modified by the installer scripts which customize it to be installed to the
+internal flash of an HTP-1. These scripts run without chroot - the filesystem
+root of the HTP-1 is available at /htp1-root and the filesystem root of the
+SD-card installer (rescue disk) is available at /installer-root. The /htp1-mods
+folder is available as well.
 
 #### Assets
 

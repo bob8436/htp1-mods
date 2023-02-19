@@ -1,8 +1,6 @@
 # <file system>                                 <mount point>   <type>  <options>                                                       <dump>  <pass>
 tmpfs                                           /tmp            tmpfs   defaults,nosuid                                                 0       0
 /var/swap none swap sw 0 0
-UUID=89149220-1191-44ce-b2a5-e337eeef8f1d       /               ext4    defaults,noatime,nodiratime,commit=600,errors=remount-ro,x-gvfs-hide    0       1
-UUID=125450d7-e413-4aac-96f4-83bbdf3f02ae	/var/log	ext4	defaults,noatime,nodiratime,commit=600,errors=remount-ro,x-gvfs-hide	0	1
-UUID=1117-B4A4	/vfat	vfat	defaults,errors=remount-ro	0	1
+UUID=526da486-351b-4082-be61-501240d87040       /               ext4    defaults,noatime,nodiratime,commit=600,errors=remount-ro,x-gvfs-hide    0       1
 /dev/mmcblk1boot0 /mnt/rodata ext4 defaults,nofail,ro 0 0
 /dev/mmcblk2boot0 /mnt/rodata ext4 defaults,nofail,ro 0 0

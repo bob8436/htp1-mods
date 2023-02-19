@@ -1,0 +1,175 @@
+<!-- System settings -->
+<!-- used to be remote settings -->
+
+<div class="col-sm-12 col-md-6">
+    <h2>Monolith HTP-1 </h2>
+</div>
+
+
+<!-- is this necessary? <html lang="en" ng-app="OlympiaApp"> -->
+
+
+<div class="col-sm-12 col-md-6">
+    IP addr: {{mso.hostip}}
+</div>
+
+<div class="col-md-12">
+    <div >
+        Video status:
+            {{mso.videostat.VideoResolution}} {{mso.videostat.VideoColorSpace}} {{mso.videostat.VideoMode}} 
+            {{mso.videostat.HDRstatus}} {{mso.videostat.VideoBitDepth}} {{mso.videostat.Video3D}}
+    </div>
+</div>
+<div class="col-sm-12 col-md-6">
+    <label>
+    Unit Name:
+    </label>
+    <input type="text"
+        class="text-left"
+        ng-model="mso.unitname"
+        ng-model-options="{ allowInvalid: false, debounce: 300, updateOn: 'change' }"
+        onchange="validateTextInput(this,'HTP-1','change')"
+    >
+</div>
+<div>
+         
+    <div><md-button class="md-fab" aria-label="FAB" ng-click="mso.powerIsOn=false">
+        <md-icon aria-label="Power">
+        power_settings_new
+        </md-icon>
+        </md-button>
+        Place unit in standby
+    </div>
+    <md-button style="min-width:9em" ng-click="mso.fastStart=='on'?mso.fastStart='off':mso.fastStart='on'"
+               ng-class="{'md-raised':mso.fastStart == 'on'}">
+    Fast Start {{mso.fastStart}}
+    </md-button>
+     
+    <md-button style="min-width:9em" ng-click="mso.fastStartPassThrough=='on'?mso.fastStartPassThrough='off':mso.fastStartPassThrough='on'"
+               ng-class="{'md-raised':mso.fastStartPassThrough == 'on'}">
+    Video Pass Through {{mso.fastStartPassThrough}}
+    
+    </md-button>
+    <div class="col-sm-12 col-md-6">
+        Power on Volume
+    <input id="vpl" name="vpl" type="number" min="-100" max ="0"
+        class="text-right"
+        ng-model="mso.powerOnVol" 
+        ng-model-options="{ allowInvalid: true, debounce: 300, updateOn: 'change' }" 
+        onclick ="validateNumber(this,-100,0, 'click')" 
+        onchange="validateNumber(this,-100,0, 'change')"> dB
+     </div>
+
+    <md-button style="min-width:11em" ng-click="mso.hw.fpBright=(mso.hw.fpBright+1)%11"
+                ng-class="{'md-raised':mso.hw.fpBright != 0}">
+    Front Panel Brightness {{ mso.hw.fpBright}} 
+    </md-button>
+<!--    <md-button style="min-width:9em" ng-click="mso.volumeDisplay=='button'?mso.volumeDisplay='slider':mso.volumeDisplay='button'" -->
+    <md-button style="min-width:9em" ng-click=
+               "mso.volumeDisplay=='button'
+                    ?  mso.volumeDisplay='button4'
+                    : (mso.volumeDisplay=='button4'
+                        ?  mso.volumeDisplay='slider'
+                        : (mso.volumeDisplay=='slider'
+                            ?  mso.volumeDisplay='both'
+                            : (mso.volumeDisplay=='both'
+                                ?  mso.volumeDisplay='both4'
+                                : mso.volumeDisplay='button'
+                              )
+                          )
+                      )"
+               ng-class="{'md-raised':mso.volumeDisplay == 'slider'}">
+               Volume Display: {{mso.volumeDisplay}}
+    </md-button>
+    <div class="col-sm-12 col-md-6">
+         Export Configuration:   Right click <a href="/config.json">here</a> and save target link.
+         <p>
+         Import Configuration:
+        <form action="/import" method="post" enctype="multipart/form-data">
+            <input id="myfile" name="myfile" accept="application/json" type="file" value="Import Configuration: ">
+            <input type="submit" name="upload" value="Import selected file">
+        </form>
+        </p>
+
+
+    </div>
+
+    <div class="col-sm-12 col-md-6">
+         <p>
+	 Follow this link to the <a href="/dirac.html">Dirac Filters Export/Import Tools</a>
+        </p>
+    </div>
+    <br/>
+    <div class="col-sm-12 col-md-12 ml-2" style="color:purple">
+        Press this button to update your internal DAC/APM card to the latest v253. This can resolve dropout issues<br/>
+        with high channel counts. Please visit the info page to see what APM firmware you are on first.
+        <md-button style="min-width:9em; color:white; background-color:purple" ng-click="parentScope.updateAPM253()">
+               Update to APM v253
+        </md-button>
+    </div>
+    <br/>
+    <div class="col-sm-12 col-md-6">
+        Country Code for Wireless Regulatory Settings: <select ng-model="mso.crda">
+            <option ng-repeat="(code, country) in parentScope.countrycodes" value="{{code}}">{{code}}: {{country}}</option>
+        </select>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        Display Video Status on Home Page:
+        <input type="checkbox"  ng-model="mso.stat.displayVideoStat" ngTrueValue = "mso.stat.displayVideoStat = true" >
+    </div>
+    <div class="col-sm-12 col-md-6">
+        Display Extended Audio Status:
+        <input type="checkbox"  ng-model="mso.stat.displayAudioStat" ngTrueValue = "mso.stat.displayAudioStat = true" >
+    </div>
+    <div class="col-sm-12 col-md-6">
+        Advanced Input Settings:
+        <input type="checkbox"  ng-model="mso.stat.displayAdvancedSettings" ngTrueValue = "mso.stat.displayAdvancedSettings = true" >
+    </div>
+    <div class="col-sm-12 col-md-6">
+        Enable Support Tools:
+        <input type="checkbox"  ng-model="mso.stat.enableSupportTools" ngTrueValue = "mso.stat.enableSupportTools = true" >
+    </div>
+    <div ng-if="mso.stat.enableSupportTools">
+        <div class="col-sm-12 col-md-12 ml-2">
+           "Warning: Enable diagnostics only if requested by support.  Diagnostics may affect system performance."
+        </div>
+        <div class="col-sm-12 col-md-12 ml-2">
+           <input id="vpl" name="vpl" type="number" min="0" max ="1023"
+            class="text-right ml-2"
+            ng-model="debugMask" 
+            ng-model-options="{ allowInvalid: true, debounce: 300 }" 
+            onclick ="validateNumber(this,0,1023, 'click')" 
+            onchange="validateNumber(this,0,1023, 'change')">  Debug Mask
+           <md-button style="min-width:9em" ng-click="parentScope.socket.send('applydebug '+ debugMask)">
+           SET DEBUG MASK 
+           </md-button>
+        </div>
+        <div class="col-sm-12 col-md-12 ml-2">
+            <table><tr><td>
+            <md-button style="min-width:9em" ng-click="mso.persistLogs=='on'?mso.persistLogs='off':mso.persistLogs='on'"
+                       ng-class="{'md-raised':mso.persistLogs == 'on'}">
+            Persist Logs {{mso.persistLogs}}
+            </md-button></td><td>
+            Warning: Persisting logs disables the ramdisk logs are normally written to. This will increase wear<br/>
+            on flash media and could result in your HTP-1's internal disk or SD-card failing sooner.<br/>
+            A reboot is required for this setting to take effect.
+            </td></table>
+        </div>
+
+        <div class="col-sm-12 col-md-12 ml-2">
+            Download <a href="/olylogfiles">system log files</a> for technical support<p>
+        </div>
+        <div class="col-sm-12 col-md-12 ml-2">
+            Review <a href="/powerlog">system power event log</a><p>
+        </div>
+        <div class="col-sm-12 col-md-12 ml-2" style="color:red">
+            DANGER: Reset all settings to factory default:
+<!-- talk to Jon for a better implementation-->
+            <md-button style="min-width:9em; color:yellow; background-color:red" ng-click="parentScope.confirmFactoryReset()">
+                   Reset All Settings
+            </md-button>
+        </div>
+   </div>  <!-- end conditional on   mso.stat.displayAdvancedSettings -->
+
+</div>
+

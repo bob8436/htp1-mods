@@ -1,0 +1,164 @@
+<md-dialog style="width: 80%; height: 80%">
+<md-dialog-content>
+<md-toolbar>
+<div class="md-toolbar-tools">
+    <h2>Detailed Status</h2>
+    <span flex>
+    </span>
+    <md-button class="md-icon-button" ng-click="cancel()">
+    <md-icon aria-label="Close dialog">
+    close
+    </md-icon>
+    </md-button>
+</div>
+</md-toolbar>
+<div class="ml-2">
+	<strong>Monolith HTP-1</strong>
+</div>
+<div class="ml-2">
+	Current System Software version is: "{{mso.versions.swVer}}";
+	read its<a class="ml-2" href="/current_release_notes">Release Notes</a>.
+</div>
+<div class="text-left ml-2">
+    The system was built on: {{mso.versions.GuiNodeRed}}
+</div>
+<!-- is this necessary? <html lang="en" ng-app="OlympiaApp"> -->
+
+<div>
+   <hr>
+</div>
+
+<style>
+.statnewupdate {
+    background-color : yellow;
+}
+</style>
+<div class="ml-2">
+    <!--  mso.stat.newupdate is read from /var/lib/olympia/newupdate.txt, 
+             which is updated by visiting /history.html through executing gitrevertform.sh,
+             or by the update checker
+          Visiting /release_notes triggers update check and 
+             displays the latest Master Release Notes.
+          Visiting /current_release_notes triggers markdown to 
+             convert relnotes/Release_Notes.txt to HTML. 
+    -->
+    <span ng-if="mso.stat.newupdate == 'updateavailable'" style="background-color : yellow">
+        You are not on the latest Master Release System Software.
+	<!-- Read the<a class="ml-2" href="/current_release_notes">Release Notes</a> for the current system software. -->
+    </span>
+    <p>
+    <p>
+    Update the system to the latest<a class="ml-2" href="/update.html">Master Release</a> System Software.
+    Read the<a class="ml-2" href="/release_notes">Release Notes</a> for the latest Master Release System Software.
+    <p>
+    You can see a list of all releases on the<a class="ml-2" href="/history.html">history</a> page and change to a different system software version.
+</div>
+
+<div class="ml-2">
+    Update the system using an Internet connection.  The system must have Internet access.  
+    <div ng-if="mso.stat.devrespavail">
+        <p><p><strong>The development team has sent you a response.  Please visit the <a href="/feedback" target="_blank">feedback</a></strong> page
+        </p></p>
+    </div>
+</div>
+   <div>
+      <hr>
+   </div>
+
+<a class="ml-2" href="/register.html" target="_blank">Register Device</a>:
+<p>
+<div class="ml-2">
+    Register this device on the Device Cloud for Amazon Alexa voice control.  (Available once the HTP-1 Amazon Alexa Smart Home Skill has been certified.)
+</div>
+<div>
+    ----------------------------------------------------
+</div>
+
+<div class="row ml-2" >
+    IP addr: {{mso.hostip}}
+</div>
+
+<div ng-if="mso.stat.displayAudioStat" class="row ml-2"  >
+    <div class="text-left">
+        <div>
+            Decoder sample rate: {{mso.status.DECSampleRate}}
+        </div>
+        <div >
+            Encoder sample rate: {{mso.status.ENCSampleRate}}
+        </div>
+    </div>
+</div>
+
+<div class="row ml-2"  >
+    <div>
+        video status: {{mso.videostat.VideoResolution}} {{mso.videostat.VideoColorSpace}} 
+        {{mso.videostat.VideoMode}} {{mso.videostat.HDRstatus}} {{mso.videostat.VideoBitDepth}} 
+        {{mso.videostat.Video3D}}
+    </div>
+</div>
+<div class="row ml-2"  >
+    <div >
+        TV Sound Source: {{mso.stat.TVSoundSrc}}
+    </div>
+</div>
+<div class="row ml-2"  >
+    <div>
+        earc link status:  {{mso.stat.earcLinkStatus}}
+    </div>
+</div>
+<div class="row ml-2"  >
+    <div>
+        CEC status:  {{mso.stat.CECStatus}}
+    </div>
+</div>
+
+
+<div  class="row mt-2 mb-5">
+    <div class="col-md-12 text-left ml-2">
+        <h5>Software and Hardware versions:</h5>
+        <h6 style="color:purple">Note: if you've just run an update, you may need to do a full refresh of this page to update version information</h6>
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        system software: {{mso.versions.swVer}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        guiNodeRed: {{mso.versions.GuiNodeRed}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        avController: {{mso.versions.avController}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        APM Module: {{mso.versions.apm100}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        HDMI Module: {{mso.versions.hdmiVer}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        backplane firmware: {{mso.versions.backplane}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        hardware: {{mso.versions.hardware}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        Serial Number: {{mso.versions.SerialNumber}}
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        rootfs ver: {{mso.versions.rootfsVer}}
+    </div>
+</div>
+
+<div  class="row mt-2 mb-5">
+    <div class="col-md-12 text-left ml-2">
+        Send <a href="/feedback" target="_blank">feedback</a> to the development team.<p>
+    </div>
+    <div class="col-md-12 text-left ml-2">
+        <a href="/privacy" target="_blank">Privacy Disclosure</a><p>
+    </div>
+        <div class="col-md-12 text-left ml-2">
+        <a href="/legal.html" target="_blank">Legal and Regulatory</a><p>
+    </div>
+</div>
+
+
+</md-dialog-content>
+</md-dialog>

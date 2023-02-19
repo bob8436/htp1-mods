@@ -2,9 +2,8 @@
 set -euo pipefail
 
 # Get a listing of the path to each script we need to run, sorted by
-# filename only. This way we get the correct ordering across both inside
-# and outside scripts
-SCRIPTS=$( find ${MODS_BASE_DIR}/scripts/inside_scripts/ ${MODS_BASE_DIR}/scripts/outside_scripts/ \
+# filename only. This way we get the correct ordering
+SCRIPTS=$( find ${MODS_BASE_DIR}/scripts/rootfs_scripts/  \
     -maxdepth 1 -regex ".*/[0-9][0-9]_[^/]*" -printf '%f\t%p\n' | sort -k1 | \
     cut -d$'\t' -f2 )
 for SCRIPT in ${SCRIPTS}

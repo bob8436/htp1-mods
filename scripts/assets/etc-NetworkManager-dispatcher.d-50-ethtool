@@ -1,0 +1,17 @@
+#!/bin/sh
+myname=${0##*/}
+log() { logger -p user.info -t "${myname}[$$]" "$*"; }
+IFACE=$1
+ACTION=$2
+
+case ${IFACE} in
+    eth0)
+        case ${ACTION} in
+            up)
+                log "Fixing advertised speeds on $IFACE"
+                /sbin/ethtool -s eth0 advertise 0x00f
+                /sbin/ethtool -s eth0 speed 100 duplex full
+                ;;
+        esac
+        ;;
+esac

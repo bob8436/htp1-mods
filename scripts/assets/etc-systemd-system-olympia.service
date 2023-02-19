@@ -1,0 +1,12 @@
+[Unit]
+After=sshd.service network.target
+Wants=lightdm.service
+
+[Service]
+User=root
+Type=forking
+ExecStart=/bin/bash -c 'PATH=/root/.nvm/versions/node/v9.5.0/bin:$PATH exec /opt/olympia/start-olympia.sh'
+ExecStop=/opt/olympia/stop-olympia.sh
+
+[Install]
+WantedBy=default.target

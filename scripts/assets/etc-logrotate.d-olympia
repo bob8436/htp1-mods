@@ -1,0 +1,17 @@
+/var/log/olympia/avController.log
+/var/log/olympia/chromium.log
+/var/log/olympia/clock.log
+/var/log/olympia/node-red.log
+/var/log/olympia/olympia.log
+/var/log/olympia/picocom_apm.log
+/var/log/olympia/picocom_hsr.log
+/var/log/olympia/surf.log
+/var/log/olympia/update.log
+{
+  rotate 10
+  daily
+  compress
+  missingok
+  notifempty
+  copytruncate
+}
